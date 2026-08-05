@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clapperboard Digital</title>
+<meta name="description" content="Clapetă digitală pentru platoul de filmare — generează un ecran cu informațiile filmării, exportabil ca video, PDF sau imagine.">
+<link rel="icon" href="../icon/icon.png" type="image/png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root{
+    --bg:#0A0A0C; --bg-elevated:#131316; --panel:#161619; --panel-2:#1C1C20;
+    --border:#2C2C31; --text:#ECEEF1; --text-muted:#9A9AA2; --text-faint:#666670;
+    --yellow:#F5C518; --yellow-dim:#3D3410; --white:#F0F0F0;
+    --font-display:'Space Grotesk', sans-serif; --font-body:'Inter', sans-serif; --font-mono:'JetBrains Mono', monospace;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6;
+  }
+  h1,h2,h3{font-family:var(--font-display); font-weight:600; letter-spacing:-0.01em; margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+
+  /* stripes: the app's own signature visual, reused throughout the page */
+  .stripes{
+    height:26px; width:100%;
+    background: repeating-linear-gradient(115deg, var(--yellow) 0 22px, #0A0A0C 22px 44px);
+  }
+
+  header{
+    position:sticky; top:0; z-index:10;
+    background:rgba(10,10,12,0.88); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
+  }
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 0;}
+  .brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:600;}
+  .brand-mark{
+    width:30px; height:30px; border-radius:8px; background:#000;
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--white); font-size:14px;
+    border: 2px solid var(--yellow);
+  }
+  .lang-switch{display:flex; gap:4px;}
+  .lang-btn{
+    background:none; border:1px solid var(--border); color:var(--text-faint);
+    border-radius:6px; padding:5px 10px; font-size:11px; font-family:var(--font-mono); cursor:pointer;
+  }
+  .lang-btn.active{border-color:var(--yellow); color:var(--yellow);}
+
+  .hero{padding:70px 0 0; text-align:center;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px;
+    color:var(--yellow); border:1px solid var(--yellow-dim); background:var(--yellow-dim);
+    padding:6px 14px; border-radius:100px; margin-bottom:22px;
+  }
+  .hero h1{font-size:clamp(32px,5vw,52px); line-height:1.1; max-width:760px; margin:0 auto;}
+  .hero h1 .accent{color:var(--yellow);}
+  .hero p{color:var(--text-muted); font-size:16px; max-width:560px; margin:20px auto 0;}
+
+  .cta-row{display:flex; gap:12px; justify-content:center; margin-top:32px; flex-wrap:wrap; padding-bottom:56px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 22px; border-radius:9px; font-weight:600; font-size:14px;
+    text-decoration:none; border:1px solid var(--border); transition:transform .1s ease, border-color .1s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--yellow); border-color:var(--yellow); color:#111;}
+  .btn-secondary{background:var(--panel-2); color:var(--text);}
+  .btn-secondary:hover{border-color:#4A4A52;}
+
+  /* slate mockup: a mini reproduction of the generated screen */
+  .slate-mock{
+    max-width:760px; margin:0 auto 60px; border-radius:14px; overflow:hidden;
+    border:1px solid var(--border); background:#0A0A0C;
+  }
+  .slate-mock .rows{padding:26px 34px 34px;}
+  .slate-mock h3{color:var(--white); text-align:center; font-size:20px; letter-spacing:.06em; margin-bottom:16px;}
+  .slate-row{display:flex; gap:18px; padding:7px 0; border-bottom:1px solid #1c1c20; font-size:13.5px;}
+  .slate-row:last-child{border-bottom:none;}
+  .slate-row .k{color:var(--yellow); font-weight:700; width:90px; flex:none;}
+  .slate-row .v{color:var(--text);}
+
+  section{padding:60px 0;}
+  .section-title{text-align:center; margin-bottom:38px;}
+  .section-title h2{font-size:26px;}
+  .section-title p{color:var(--text-muted); margin-top:8px; font-size:14px;}
+
+  .about-text{max-width:700px; margin:0 auto; text-align:center; color:var(--text-muted); font-size:15px;}
+
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  .feature{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:22px;
+  }
+  .feature .icon{font-size:22px; margin-bottom:12px;}
+  .feature h3{font-size:15px; margin-bottom:8px;}
+  .feature p{color:var(--text-muted); font-size:13px; line-height:1.55; margin:0;}
+
+  .steps{max-width:700px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
+  .step{
+    display:flex; align-items:flex-start; gap:14px;
+    background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:15px 18px;
+  }
+  .step .num{
+    flex:none; width:28px; height:28px; border-radius:50%;
+    background:var(--yellow); color:#111; font-weight:700; font-size:12.5px;
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
+  }
+  .step .txt strong{display:block; margin-bottom:2px; font-size:14px;}
+
+  .platforms{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .platform-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:26px;
+    display:flex; flex-direction:column; gap:14px; text-align:center;
+  }
+  .platform-card .plat-icon{font-size:28px;}
+  .platform-card .plat-name{font-family:var(--font-display); font-size:17px; font-weight:600;}
+  .platform-card .plat-file{font-family:var(--font-mono); font-size:12px; color:var(--text-faint);}
+  .platform-card .plat-note{font-size:12.5px; color:var(--text-muted); margin:0;}
+
+  footer{border-top:1px solid var(--border); padding:34px 0; text-align:center; color:var(--text-faint); font-size:12.5px;}
+  footer a{color:var(--yellow); text-decoration:none;}
+
+  @media(max-width:760px){
+    .grid{grid-template-columns:1fr;}
+    .platforms{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="stripes"></div>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand"><div class="brand-mark">C</div> Clapperboard Digital</div>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="ro">RO</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero wrap">
+  <div class="eyebrow"><span data-t="eyebrow"></span></div>
+  <h1 data-t="hero_title"></h1>
+  <p data-t="hero_sub"></p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://github.com/gordasgdc/clapperboard-digital/releases/latest" data-t="cta_download"></a>
+    <a class="btn btn-secondary" href="https://github.com/gordasgdc/clapperboard-digital" data-t="cta_source"></a>
+  </div>
+</section>
+
+<div class="slate-mock">
+  <div class="stripes"></div>
+  <div class="rows">
+    <h3>CLAPPERBOARD</h3>
+    <div class="slate-row"><div class="k" id="slate-project-label">Proiect</div><div class="v">Nunta Ana &amp; Ion</div></div>
+    <div class="slate-row"><div class="k" id="slate-scene-label">Scenă</div><div class="v">12A</div></div>
+    <div class="slate-row"><div class="k" id="slate-take-label">Take</div><div class="v">3</div></div>
+    <div class="slate-row"><div class="k" id="slate-director-label">Regizor</div><div class="v">Cristi Gordas</div></div>
+    <div class="slate-row"><div class="k" id="slate-camera-label">Cameră</div><div class="v">Sony FX6</div></div>
+  </div>
+  <div class="stripes"></div>
+</div>
+
+<section class="wrap" id="about">
+  <div class="section-title">
+    <h2 data-t="about_title"></h2>
+  </div>
+  <p class="about-text" data-t="about_text"></p>
+</section>
+
+<section class="wrap" id="features">
+  <div class="section-title">
+    <h2 data-t="features_title"></h2>
+    <p data-t="features_sub"></p>
+  </div>
+  <div class="grid" id="features-grid"></div>
+</section>
+
+<section class="wrap" id="how">
+  <div class="section-title">
+    <h2 data-t="how_title"></h2>
+  </div>
+  <div class="steps" id="steps-list"></div>
+</section>
+
+<section class="wrap" id="download">
+  <div class="section-title">
+    <h2 data-t="download_title"></h2>
+    <p data-t="download_sub"></p>
+  </div>
+  <div class="platforms">
+    <div class="platform-card">
+      <div class="plat-icon">🍎</div>
+      <div class="plat-name">macOS</div>
+      <div class="plat-file">ClapperboardDigital.pkg</div>
+      <p class="plat-note" data-t="mac_hint"></p>
+      <a class="btn btn-secondary" href="https://github.com/gordasgdc/clapperboard-digital/releases/latest" data-t="cta_download"></a>
+    </div>
+    <div class="platform-card">
+      <div class="plat-icon">🪟</div>
+      <div class="plat-name">Windows</div>
+      <div class="plat-file">ClapperboardDigital.exe</div>
+      <p class="plat-note" data-t="win_hint"></p>
+      <a class="btn btn-secondary" href="https://github.com/gordasgdc/clapperboard-digital/releases/latest" data-t="cta_download"></a>
+    </div>
+  </div>
+  <p class="about-text" style="margin-top:22px; font-size:12.5px;" data-t="ffmpeg_note"></p>
+</section>
+
+<footer class="wrap">
+  <div data-t="footer_line"></div>
+  <div style="margin-top:8px;">
+    <a href="https://github.com/gordasgdc">GitHub</a> ·
+    <a href="https://web.facebook.com/cristiGDC">Facebook</a> ·
+    <a href="https://www.youtube.com/@cristigordas">YouTube</a>
+  </div>
+</footer>
+
+<div class="stripes"></div>
+
+<script>
+const T = {
+  ro: {
+    eyebrow: "Înlocuiește clasica clapetă",
+    hero_title: 'Clapeta digitală pentru <span class="accent">platoul de filmare</span>',
+    hero_sub: "Completează proiectul, scena și take-ul, vezi ecranul actualizat instant și exportă-l ca video, PDF sau imagine — direct pe platou.",
+    cta_download: "Descarcă ultima versiune",
+    cta_source: "Cod sursă (GitHub)",
+    about_title: "Despre aplicație",
+    about_text: "Clapperboard Digital generează, în timp real, ecranul cu informațiile filmării — proiect, scenă, take, regizor, cameră, dată și oră — pe care îl filmezi la începutul fiecărui clip, ca referință pentru montaj. Rulează local, nu are nevoie de cont sau conexiune la internet.",
+    features_title: "Caracteristici",
+    features_sub: "Simplă, rapidă, gândită pentru ritmul unui platou de filmare.",
+    features: [
+      ["👁️", "Previzualizare live", "Vezi instant cum arată ecranul, pe măsură ce completezi câmpurile."],
+      ["🎞️", "Export video", "MOV (ProRes) sau MP4 (H.264), cu durată personalizabilă."],
+      ["📄", "Export PDF", "Un document curat, cu toate informațiile filmării, gata de printat."],
+      ["🖼️", "Export imagine", "PNG la rezoluție 1920×1080, pentru orice alt flux de lucru."],
+      ["🔢", "Take rapid", "Butoane +/− pentru a avansa numărul de take fără să ștergi nimic."],
+      ["🌍", "RO / EN / ES", "Interfață completă în trei limbi, comutabilă fără repornire."],
+    ],
+    how_title: "Cum funcționează",
+    steps: [
+      ["📦", "Descarcă aplicația de pe GitHub Releases"],
+      ["🖥️", "Instalează (.pkg pe Mac, .exe pe Windows)"],
+      ["✏️", "Completează proiectul, scena, take-ul și restul informațiilor"],
+      ["👁️", "Verifică previzualizarea live din partea dreaptă"],
+      ["🎬", "Exportă ca video, PDF sau imagine și filmează ecranul"],
+    ],
+    download_title: "Descarcă și instalează",
+    download_sub: "Alege pachetul pentru sistemul tău din ultima versiune de pe GitHub.",
+    mac_hint: "Dublu-click pe .pkg și urmează instalatorul.",
+    win_hint: "Dublu-click pe .exe pentru a rula aplicația.",
+    ffmpeg_note: "Exportul video necesită FFmpeg instalat separat pe sistem. Exportul PDF și imagine funcționează fără nicio dependință suplimentară.",
+    footer_line: "Clapperboard Digital · gratuit și open-source (MIT) · realizat de Cristi Gordas",
+  },
+  en: {
+    eyebrow: "Replaces the classic clapperboard",
+    hero_title: 'The digital slate for <span class="accent">the film set</span>',
+    hero_sub: "Fill in the project, scene, and take, watch the screen update instantly, and export it as video, PDF, or image — right on set.",
+    cta_download: "Download latest version",
+    cta_source: "Source code (GitHub)",
+    about_title: "About the app",
+    about_text: "Clapperboard Digital generates, in real time, the shoot-information screen — project, scene, take, director, camera, date and time — that you film at the start of every clip as an editing reference. Runs entirely locally, no account or internet connection needed.",
+    features_title: "Features",
+    features_sub: "Simple, fast, built for the pace of a film set.",
+    features: [
+      ["👁️", "Live preview", "See the screen update instantly as you fill in the fields."],
+      ["🎞️", "Video export", "MOV (ProRes) or MP4 (H.264), with a customizable duration."],
+      ["📄", "PDF export", "A clean document with all the shoot info, ready to print."],
+      ["🖼️", "Image export", "1920×1080 PNG, for any other workflow."],
+      ["🔢", "Quick take", "+/− buttons to advance the take number without retyping."],
+      ["🌍", "RO / EN / ES", "Full interface in three languages, switchable without restarting."],
+    ],
+    how_title: "How it works",
+    steps: [
+      ["📦", "Download the app from GitHub Releases"],
+      ["🖥️", "Install (.pkg on Mac, .exe on Windows)"],
+      ["✏️", "Fill in the project, scene, take and the rest of the info"],
+      ["👁️", "Check the live preview on the right"],
+      ["🎬", "Export as video, PDF, or image and film the screen"],
+    ],
+    download_title: "Download & install",
+    download_sub: "Pick the package for your system from the latest GitHub release.",
+    mac_hint: "Double-click the .pkg and follow the installer.",
+    win_hint: "Double-click the .exe to run the app.",
+    ffmpeg_note: "Video export requires FFmpeg installed separately on your system. PDF and image export work with no extra dependencies.",
+    footer_line: "Clapperboard Digital · free & open-source (MIT) · built by Cristi Gordas",
+  },
+  es: {
+    eyebrow: "Sustituye a la claqueta clásica",
+    hero_title: 'La claqueta digital para <span class="accent">el set de rodaje</span>',
+    hero_sub: "Completa el proyecto, la escena y la toma, mira cómo se actualiza la pantalla al instante y expórtala como vídeo, PDF o imagen — directamente en el set.",
+    cta_download: "Descargar última versión",
+    cta_source: "Código fuente (GitHub)",
+    about_title: "Sobre la aplicación",
+    about_text: "Clapperboard Digital genera, en tiempo real, la pantalla con la información del rodaje — proyecto, escena, toma, director, cámara, fecha y hora — que filmas al inicio de cada clip como referencia de montaje. Funciona en local, sin cuenta ni conexión a internet.",
+    features_title: "Características",
+    features_sub: "Simple, rápida, pensada para el ritmo de un set de rodaje.",
+    features: [
+      ["👁️", "Vista previa en vivo", "Ve la pantalla actualizarse al instante mientras rellenas los campos."],
+      ["🎞️", "Exportación de vídeo", "MOV (ProRes) o MP4 (H.264), con duración personalizable."],
+      ["📄", "Exportación PDF", "Un documento limpio con toda la información del rodaje, listo para imprimir."],
+      ["🖼️", "Exportación de imagen", "PNG a 1920×1080, para cualquier otro flujo de trabajo."],
+      ["🔢", "Toma rápida", "Botones +/− para avanzar el número de toma sin volver a escribir."],
+      ["🌍", "RO / EN / ES", "Interfaz completa en tres idiomas, cambiable sin reiniciar."],
+    ],
+    how_title: "Cómo funciona",
+    steps: [
+      ["📦", "Descarga la app desde GitHub Releases"],
+      ["🖥️", "Instala (.pkg en Mac, .exe en Windows)"],
+      ["✏️", "Rellena el proyecto, la escena, la toma y el resto de datos"],
+      ["👁️", "Comprueba la vista previa en vivo a la derecha"],
+      ["🎬", "Exporta como vídeo, PDF o imagen y filma la pantalla"],
+    ],
+    download_title: "Descargar e instalar",
+    download_sub: "Elige el paquete para tu sistema desde la última versión de GitHub.",
+    mac_hint: "Haz doble clic en el .pkg y sigue el instalador.",
+    win_hint: "Haz doble clic en el .exe para ejecutar la app.",
+    ffmpeg_note: "La exportación de vídeo requiere FFmpeg instalado por separado en tu sistema. La exportación de PDF e imagen funciona sin dependencias adicionales.",
+    footer_line: "Clapperboard Digital · gratis y de código abierto (MIT) · creado por Cristi Gordas",
+  },
+};
+
+let lang = localStorage.getItem("clapperboard_docs_lang") || "ro";
+
+const SLATE_LABELS = {
+  ro: ["Proiect", "Scenă", "Take", "Regizor", "Cameră"],
+  en: ["Project", "Scene", "Take", "Director", "Camera"],
+  es: ["Proyecto", "Escena", "Toma", "Director", "Cámara"],
+};
+
+function render() {
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el => {
+    const key = el.getAttribute("data-t");
+    if (d[key] !== undefined) el.innerHTML = d[key];
+  });
+  document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
+
+  const labels = SLATE_LABELS[lang];
+  document.getElementById("slate-project-label").textContent = labels[0];
+  document.getElementById("slate-scene-label").textContent = labels[1];
+  document.getElementById("slate-take-label").textContent = labels[2];
+  document.getElementById("slate-director-label").textContent = labels[3];
+  document.getElementById("slate-camera-label").textContent = labels[4];
+
+  document.getElementById("features-grid").innerHTML = d.features.map(f => `
+    <div class="feature"><div class="icon">${f[0]}</div><h3>${f[1]}</h3><p>${f[2]}</p></div>
+  `).join("");
+
+  document.getElementById("steps-list").innerHTML = d.steps.map((s, i) => `
+    <div class="step"><div class="num">${i + 1}</div><div class="txt"><strong>${s[0]} ${s[1]}</strong></div></div>
+  `).join("");
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    lang = btn.dataset.lang;
+    localStorage.setItem("clapperboard_docs_lang", lang);
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
