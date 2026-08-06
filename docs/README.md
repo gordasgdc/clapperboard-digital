@@ -26,6 +26,7 @@ După instalare, aplicația se deschide instant, ca orice altă aplicație de pe
 - **Take +/−** — butoane mari, ușor de atins
 - **CLAP** — un singur buton mare: înregistrează take-ul curent (cu sunet și vibrație), apoi avansează automat la următorul
 - **Cod QR** — generat automat, cu toate informațiile filmării, actualizat live
+- **Dată și oră live** — afișate în interfață, actualizate în fiecare secundă; incluse automat în codul QR și în fiecare intrare din istoric, pentru sincronizare precisă în montaj
 - **Istoric** — toate take-urile înregistrate, salvate local pe telefon; atinge o intrare pentru a reîncărca acele informații
 - **Contor Take X/Y** — arată take-ul curent față de totalul înregistrat pentru acel proiect/scenă
 - **Ecran complet** — clapeta ocupă tot ecranul, gata de filmat

@@ -51,6 +51,13 @@
   .icon-btn:active{ background:var(--panel-2); }
   .header-actions{ display:flex; gap:8px; }
 
+  .datetime-bar{
+    text-align:center; font-size:15px; font-weight:700; color:var(--accent);
+    background:var(--panel); border:1px solid var(--border); border-radius:12px;
+    padding:10px 12px; letter-spacing:.02em; font-variant-numeric:tabular-nums;
+  }
+  .datetime-bar span{ color:var(--text); }
+
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:13px; color:var(--muted); font-weight:600; }
   .field input{
@@ -197,6 +204,10 @@
       <button class="icon-btn" id="fullscreen-btn" title="Ecran complet (f)">⛶</button>
     </div>
   </header>
+
+  <div class="datetime-bar" id="datetime-bar">
+    📅 <span id="live-date">—</span> &nbsp; ⏰ <span id="live-time">—</span>
+  </div>
 
   <div class="field">
     <label for="project">📁 Proiect</label>
@@ -379,6 +390,24 @@
     if (f === "take") return;
     els[f].addEventListener("input", () => { saveState(); refreshTakeCounter(); renderQr(); });
   });
+
+  // ------------------------------------------------------------- clock --
+
+  function updateClock() {
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    const timeStr = now.toTimeString().slice(0, 8); // HH:MM:SS
+    const dateEl = document.getElementById("live-date");
+    const timeEl = document.getElementById("live-time");
+    if (dateEl) dateEl.textContent = dateStr;
+    if (timeEl) timeEl.textContent = timeStr;
+  }
+
+  updateClock();
+  setInterval(() => {
+    updateClock();
+    renderQr(); // keeps the embedded date/time current for scanning
+  }, 1000);
 
   // ---------------------------------------------------------------- QR --
 
