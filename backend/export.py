@@ -23,13 +23,16 @@ def ffmpeg_available() -> bool:
 
 
 class Exporter:
-    def __init__(self):
-        self.generator = ClapperboardGenerator()
+    def __init__(self, customization: dict = None):
+        self.generator = ClapperboardGenerator(customization=customization)
+
+    def update_customization(self, customization: dict):
+        self.generator = ClapperboardGenerator(customization=customization)
 
     # ------------------------------------------------------------- image --
 
-    def export_png(self, data: dict, output_path: str) -> None:
-        image = self.generator.generate(data)
+    def export_png(self, data: dict, output_path: str, qr_image=None) -> None:
+        image = self.generator.generate(data, qr_image=qr_image)
         try:
             image.save(output_path, "PNG")
         except OSError as e:
@@ -37,13 +40,13 @@ class Exporter:
 
     # ------------------------------------------------------------- video --
 
-    def export_video(self, data: dict, output_path: str, duration_seconds: int = 5) -> None:
+    def export_video(self, data: dict, output_path: str, duration_seconds: int = 5, qr_image=None) -> None:
         """Renders a static slate clip of `duration_seconds`. Codec is
         chosen from the output extension: ProRes for .mov, H.264 for .mp4."""
         if not ffmpeg_available():
             raise ExportError("ffmpeg_missing")
 
-        image = self.generator.generate(data)
+        image = self.generator.generate(data, qr_image=qr_image)
 
         tmp_dir = tempfile.mkdtemp(prefix="clapperboard_")
         tmp_image = os.path.join(tmp_dir, "slate.png")
@@ -82,10 +85,11 @@ class Exporter:
 
     # --------------------------------------------------------------- pdf --
 
-    def export_pdf(self, data: dict, output_path: str) -> None:
+    def export_pdf(self, data: dict, output_path: str, qr_image=None) -> None:
         try:
             from reportlab.pdfgen import canvas
             from reportlab.lib.pagesizes import A4, landscape
+            from reportlab.lib.utils import ImageReader
         except ImportError:
             raise ExportError("reportlab_missing")
 
@@ -143,6 +147,14 @@ class Exporter:
             c.setFillColorRGB(0.91, 0.28, 0.24)
             c.setFont("Helvetica-Oblique", 9)
             c.drawCentredString(width / 2, 26, "Clapperboard Digital · GDC")
+
+            if qr_image is not None:
+                qr_size = 90
+                c.drawImage(
+                    ImageReader(qr_image),
+                    width - 70 - qr_size, 40,
+                    width=qr_size, height=qr_size,
+                )
 
             c.save()
         except OSError as e:

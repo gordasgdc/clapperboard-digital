@@ -2,743 +2,372 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Clapperboard Digital</title>
-<meta name="description" content="Clachetă digitală pentru platoul de filmare — timecode, proiect, scenă și take, gata de filmat.">
-<meta name="theme-color" content="#0a0a0c">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Clapperboard">
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<meta name="description" content="Clapetă digitală pentru platoul de filmare — generează un ecran cu informațiile filmării, exportabil ca video, PDF sau imagine.">
+<link rel="icon" href="../icon/icon.png" type="image/png">
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
   :root{
-    --bg:#0a0a0c;
-    --panel:#151517;
-    --panel-2:#1c1c20;
-    --border:#2c2c31;
-    --text:#f0f0f0;
-    --muted:#8a8a92;
-    --yellow:#f5c518;
-    --yellow-ink:#141200;
-    --danger:#e8483c;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bg:#0A0A0C; --bg-elevated:#131316; --panel:#161619; --panel-2:#1C1C20;
+    --border:#2C2C31; --text:#ECEEF1; --text-muted:#9A9AA2; --text-faint:#666670;
+    --yellow:#F5C518; --yellow-dim:#3D3410; --white:#F0F0F0;
+    --font-display:'Space Grotesk', sans-serif; --font-body:'Inter', sans-serif; --font-mono:'JetBrains Mono', monospace;
   }
-  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none; }
-  html,body{
-    margin:0; padding:0; background:var(--bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    height:100%; overscroll-behavior:none;
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6;
   }
-  input, textarea{ user-select:text; }
+  h1,h2,h3{font-family:var(--font-display); font-weight:600; letter-spacing:-0.01em; margin:0;}
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
 
-  .slate{
-    min-height:100vh; min-height:100dvh; display:flex; flex-direction:column;
-    padding: calc(10px + var(--safe-top)) 16px calc(14px + var(--safe-bottom));
-    gap:10px;
-  }
-
-  .topbar{ display:flex; align-items:center; justify-content:space-between; }
-  .brand{ font-size:14px; font-weight:800; letter-spacing:.08em; color:var(--muted); }
-  .brand .mark{ color:var(--yellow); }
-  .topbar-actions{ display:flex; gap:6px; }
-  .icon-btn{
-    width:38px; height:38px; border-radius:10px; border:1px solid var(--border);
-    background:var(--panel); color:var(--text); font-size:16px;
-    display:flex; align-items:center; justify-content:center; cursor:pointer;
-  }
-  .icon-btn:active{ background:var(--panel-2); }
-
+  /* stripes: the app's own signature visual, reused throughout the page */
   .stripes{
-    height:16px; border-radius:6px;
-    background: repeating-linear-gradient(115deg, var(--yellow) 0 16px, #0a0a0c 16px 32px);
+    height:26px; width:100%;
+    background: repeating-linear-gradient(115deg, var(--yellow) 0 22px, #0A0A0C 22px 44px);
   }
 
-  .slate-card{
-    flex:1; display:flex; flex-direction:column; justify-content:center; gap:2.4vh;
-    background:var(--panel); border:1px solid var(--border); border-radius:18px;
-    padding:3vh 4vw;
+  header{
+    position:sticky; top:0; z-index:10;
+    background:rgba(10,10,12,0.88); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--border);
   }
-
-  .tc-block{ text-align:center; cursor:pointer; }
-  .tc-digits{
-    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    font-size:clamp(40px, 13vw, 96px); font-weight:800; letter-spacing:.01em;
-    color:var(--text); line-height:1; font-variant-numeric:tabular-nums;
+  .nav{display:flex; align-items:center; justify-content:space-between; padding:16px 0;}
+  .brand{display:flex; align-items:center; gap:10px; font-family:var(--font-display); font-weight:600;}
+  .brand-mark{
+    width:30px; height:30px; border-radius:8px; background:#000;
+    display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--white); font-size:14px;
+    border: 2px solid var(--yellow);
   }
-  .tc-digits .frames{ color:var(--yellow); }
-  .tc-label{ margin-top:6px; font-size:12px; letter-spacing:.18em; color:var(--muted); font-weight:700; }
-
-  .info-rows{ display:flex; flex-direction:column; gap:1.6vh; }
-  .info-row{
-    display:flex; align-items:center; gap:14px; cursor:pointer;
-    padding:6px 4px; border-radius:10px;
+  .lang-switch{display:flex; gap:4px;}
+  .lang-btn{
+    background:none; border:1px solid var(--border); color:var(--text-faint);
+    border-radius:6px; padding:5px 10px; font-size:11px; font-family:var(--font-mono); cursor:pointer;
   }
-  .info-row:active{ background:var(--panel-2); }
-  .info-row .ic{ font-size:clamp(16px,3.4vw,22px); flex:none; width:1.4em; text-align:center; }
-  .info-row .val{
-    font-size:clamp(17px,4.4vw,28px); font-weight:700; color:var(--text);
-    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  .lang-btn.active{border-color:var(--yellow); color:var(--yellow);}
+
+  .hero{padding:70px 0 0; text-align:center;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:var(--font-mono); font-size:12px;
+    color:var(--yellow); border:1px solid var(--yellow-dim); background:var(--yellow-dim);
+    padding:6px 14px; border-radius:100px; margin-bottom:22px;
   }
-  .datetime-row .val{ font-size:clamp(14px,3.4vw,20px); font-weight:600; color:var(--muted); }
-  .datetime-row{ gap:8px; flex-wrap:wrap; }
+  .hero h1{font-size:clamp(32px,5vw,52px); line-height:1.1; max-width:760px; margin:0 auto;}
+  .hero h1 .accent{color:var(--yellow);}
+  .hero p{color:var(--text-muted); font-size:16px; max-width:560px; margin:20px auto 0;}
 
-  .action-row{ display:flex; gap:10px; align-items:stretch; }
-  .take-btn{
-    flex:1; min-height:64px; border-radius:14px; border:1px solid var(--border);
-    background:var(--panel); color:var(--text); font-size:15px; font-weight:800;
-    letter-spacing:.04em; cursor:pointer;
+  .cta-row{display:flex; gap:12px; justify-content:center; margin-top:32px; flex-wrap:wrap; padding-bottom:56px;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:12px 22px; border-radius:9px; font-weight:600; font-size:14px;
+    text-decoration:none; border:1px solid var(--border); transition:transform .1s ease, border-color .1s ease;
   }
-  .take-btn:active{ background:var(--panel-2); transform:scale(0.98); }
-  .clap-btn{
-    flex:1.6; min-height:64px; border-radius:14px; border:none;
-    background:var(--yellow); color:var(--yellow-ink); font-size:18px; font-weight:800;
-    letter-spacing:.03em; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--yellow); border-color:var(--yellow); color:#111;}
+  .btn-secondary{background:var(--panel-2); color:var(--text);}
+  .btn-secondary:hover{border-color:#4A4A52;}
+
+  /* slate mockup: a mini reproduction of the generated screen */
+  .slate-mock{
+    max-width:760px; margin:0 auto 60px; border-radius:14px; overflow:hidden;
+    border:1px solid var(--border); background:#0A0A0C;
   }
-  .clap-btn:active{ transform:scale(0.98); filter:brightness(0.94); }
+  .slate-mock .rows{padding:26px 34px 34px;}
+  .slate-mock h3{color:var(--white); text-align:center; font-size:20px; letter-spacing:.06em; margin-bottom:16px;}
+  .slate-row{display:flex; gap:18px; padding:7px 0; border-bottom:1px solid #1c1c20; font-size:13.5px;}
+  .slate-row:last-child{border-bottom:none;}
+  .slate-row .k{color:var(--yellow); font-weight:700; width:90px; flex:none;}
+  .slate-row .v{color:var(--text);}
 
-  .exit-hint{ text-align:center; font-size:11.5px; color:var(--muted); padding-top:2px; }
+  section{padding:60px 0;}
+  .section-title{text-align:center; margin-bottom:38px;}
+  .section-title h2{font-size:26px;}
+  .section-title p{color:var(--text-muted); margin-top:8px; font-size:14px;}
 
-  .toast{
-    position:fixed; left:50%; bottom:calc(20px + var(--safe-bottom)); transform:translateX(-50%);
-    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
-    padding:12px 20px; border-radius:100px; font-size:14px; font-weight:600;
-    box-shadow:0 8px 24px rgba(0,0,0,.5); opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
-    z-index:90;
+  .about-text{max-width:700px; margin:0 auto; text-align:center; color:var(--text-muted); font-size:15px;}
+
+  .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  .feature{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:22px;
   }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+  .feature .icon{font-size:22px; margin-bottom:12px;}
+  .feature h3{font-size:15px; margin-bottom:8px;}
+  .feature p{color:var(--text-muted); font-size:13px; line-height:1.55; margin:0;}
 
-  .flash{ position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:95; transition:opacity .08s ease; }
-  .flash.on{ opacity:.9; }
-
-  .overlay{
-    position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:60;
-    display:flex; align-items:flex-end; justify-content:center;
-    opacity:0; pointer-events:none; transition:opacity .18s ease;
+  .steps{max-width:700px; margin:0 auto; display:flex; flex-direction:column; gap:12px;}
+  .step{
+    display:flex; align-items:flex-start; gap:14px;
+    background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:15px 18px;
   }
-  .overlay.open{ opacity:1; pointer-events:auto; }
-  .sheet{
-    width:100%; max-width:520px; background:var(--panel); border-radius:20px 20px 0 0;
-    border:1px solid var(--border); border-bottom:none;
-    max-height:88vh; overflow-y:auto;
-    padding: 16px 18px calc(20px + var(--safe-bottom));
-    transform:translateY(20px); transition:transform .18s ease;
+  .step .num{
+    flex:none; width:28px; height:28px; border-radius:50%;
+    background:var(--yellow); color:#111; font-weight:700; font-size:12.5px;
+    display:flex; align-items:center; justify-content:center; font-family:var(--font-mono);
   }
-  .overlay.open .sheet{ transform:translateY(0); }
-  .sheet-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
-  .sheet-header h2{ margin:0; font-size:16px; }
+  .step .txt strong{display:block; margin-bottom:2px; font-size:14px;}
 
-  .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
-  .field label{ font-size:12.5px; color:var(--muted); font-weight:700; }
-  .field input, .field select{
-    background:var(--panel-2); border:1px solid var(--border); border-radius:10px;
-    color:var(--text); font-size:16px; padding:12px; min-height:44px;
+  .platforms{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .platform-card{
+    background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:26px;
+    display:flex; flex-direction:column; gap:14px; text-align:center;
   }
-  .field-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-  .field-grid input{ text-align:center; font-variant-numeric:tabular-nums; }
+  .platform-card .plat-icon{font-size:28px;}
+  .platform-card .plat-name{font-family:var(--font-display); font-size:17px; font-weight:600;}
+  .platform-card .plat-file{font-family:var(--font-mono); font-size:12px; color:var(--text-faint);}
+  .platform-card .plat-note{font-size:12.5px; color:var(--text-muted); margin:0;}
 
-  .sheet-actions{ display:flex; gap:10px; margin-top:12px; }
-  .sheet-btn{
-    flex:1; min-height:48px; border-radius:12px; border:1px solid var(--border);
-    background:var(--panel-2); color:var(--text); font-size:14px; font-weight:700; cursor:pointer;
+  footer{border-top:1px solid var(--border); padding:34px 0; text-align:center; color:var(--text-faint); font-size:12.5px;}
+  footer a{color:var(--yellow); text-decoration:none;}
+
+  @media(max-width:760px){
+    .grid{grid-template-columns:1fr;}
+    .platforms{grid-template-columns:1fr;}
   }
-  .sheet-btn.primary{ background:var(--yellow); color:var(--yellow-ink); border:none; }
-  .sheet-btn.danger{ color:var(--danger); }
-
-  .history-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; max-height:50vh; overflow-y:auto; }
-  .history-item{
-    background:var(--panel-2); border:1px solid var(--border); border-radius:12px;
-    padding:11px 13px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;
-  }
-  .history-item .info strong{ display:block; font-size:14px; }
-  .history-item .info span{ display:block; font-size:11.5px; color:var(--muted); margin-top:2px; font-variant-numeric:tabular-nums; }
-  .history-item .badge{ background:var(--panel); color:var(--yellow); font-weight:800; font-size:12px; padding:4px 9px; border-radius:100px; flex:none; }
-  .history-empty{ text-align:center; color:var(--muted); padding:30px 10px; font-size:13.5px; }
-
-  .qr-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:6px 0 10px; }
-  .qr-wrap canvas{ background:#fff; border-radius:10px; padding:10px; width:230px; height:230px; }
-  .qr-wrap p{ margin:0; font-size:12px; color:var(--muted); text-align:center; }
-
-  .install-banner{
-    position:fixed; left:16px; right:16px; bottom:calc(16px + var(--safe-bottom));
-    background:var(--panel-2); border:1px solid var(--border); border-radius:14px;
-    padding:14px 16px; display:flex; align-items:center; gap:12px; z-index:55;
-    box-shadow:0 10px 30px rgba(0,0,0,.4);
-    transform:translateY(150%); transition:transform .25s ease;
-  }
-  .install-banner.show{ transform:translateY(0); }
-  .install-banner p{ margin:0; font-size:13px; flex:1; }
-  .install-banner button{ border:none; border-radius:10px; padding:10px 14px; font-weight:700; font-size:13px; cursor:pointer; }
-  .install-banner .install-yes{ background:var(--yellow); color:var(--yellow-ink); }
-  .install-banner .install-no{ background:transparent; color:var(--muted); }
-
-  .hidden{ display:none !important; }
 </style>
 </head>
 <body>
 
-<div class="flash" id="flash"></div>
+<div class="stripes"></div>
 
-<div class="slate" id="slate">
-  <div class="topbar">
-    <div class="brand"><span class="mark">🎬</span> CLAPPERBOARD DIGITAL</div>
-    <div class="topbar-actions">
-      <button class="icon-btn" id="qr-btn" title="Cod QR">▦</button>
-      <button class="icon-btn" id="history-btn" title="Istoric (h)">📜</button>
-      <button class="icon-btn" id="export-btn" title="Exportă metadate">⤓</button>
-      <button class="icon-btn" id="edit-btn" title="Editează">✏️</button>
-      <button class="icon-btn" id="fullscreen-btn" title="Ecran complet (f)">⛶</button>
+<header>
+  <div class="wrap nav">
+    <div class="brand"><div class="brand-mark">C</div> Clapperboard Digital</div>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="ro">RO</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="es">ES</button>
     </div>
   </div>
+</header>
 
+<section class="hero wrap">
+  <div class="eyebrow"><span data-t="eyebrow"></span></div>
+  <h1 data-t="hero_title"></h1>
+  <p data-t="hero_sub"></p>
+  <div class="cta-row">
+    <a class="btn btn-primary" href="https://github.com/gordasgdc/clapperboard-digital/releases/latest" data-t="cta_download"></a>
+    <a class="btn btn-secondary" href="https://github.com/gordasgdc/clapperboard-digital" data-t="cta_source"></a>
+  </div>
+</section>
+
+<div class="slate-mock">
   <div class="stripes"></div>
-
-  <div class="slate-card">
-    <div class="tc-block" id="tc-block">
-      <div class="tc-digits" id="tc-digits">00:00:00<span class="frames">:00</span></div>
-      <div class="tc-label">TIMECODE — atinge pentru a seta manual</div>
-    </div>
-
-    <div class="info-rows">
-      <div class="info-row" id="row-project"><span class="ic">📁</span><span class="val" id="disp-project">Atinge pentru a completa proiectul</span></div>
-      <div class="info-row" id="row-scene"><span class="ic">🎬</span><span class="val" id="disp-scene">Scena —</span></div>
-      <div class="info-row" id="row-take"><span class="ic">🎞️</span><span class="val" id="disp-take">Take 1</span></div>
-      <div class="info-row" id="row-camera"><span class="ic">🎥</span><span class="val" id="disp-camera">Cameră —</span></div>
-      <div class="info-row datetime-row" id="row-datetime">
-        <span class="ic">📅</span><span class="val" id="disp-date">—</span>
-        <span class="ic">⏰</span><span class="val" id="disp-clock">—</span>
-      </div>
-    </div>
+  <div class="rows">
+    <h3>CLAPPERBOARD</h3>
+    <div class="slate-row"><div class="k" id="slate-project-label">Proiect</div><div class="v">Nunta Ana &amp; Ion</div></div>
+    <div class="slate-row"><div class="k" id="slate-scene-label">Scenă</div><div class="v">12A</div></div>
+    <div class="slate-row"><div class="k" id="slate-take-label">Take</div><div class="v">3</div></div>
+    <div class="slate-row"><div class="k" id="slate-director-label">Regizor</div><div class="v">Cristi Gordas</div></div>
+    <div class="slate-row"><div class="k" id="slate-camera-label">Cameră</div><div class="v">Sony FX6</div></div>
   </div>
-
-  <div class="action-row">
-    <button class="take-btn" id="take-minus">TAKE −</button>
-    <button class="take-btn" id="take-plus">TAKE +</button>
-    <button class="clap-btn" id="clap-btn">🎬 CLAP</button>
-  </div>
-
-  <div class="exit-hint">Apasă ESC sau atinge ecranul pentru a ieși din ecran complet</div>
+  <div class="stripes"></div>
 </div>
 
-<div class="overlay" id="edit-overlay">
-  <div class="sheet">
-    <div class="sheet-header"><h2>✏️ Editează informațiile</h2><button class="icon-btn" id="close-edit-btn">✕</button></div>
-    <div class="field"><label>📁 Proiect</label><input id="f-project" type="text" placeholder="Nunta Ana &amp; Mihai"></div>
-    <div class="field"><label>🎬 Scenă</label><input id="f-scene" type="text" placeholder="12A"></div>
-    <div class="field"><label>🎤 Regizor</label><input id="f-director" type="text" placeholder="Cristi Gordas"></div>
-    <div class="field"><label>🎥 Cameră</label><input id="f-camera" type="text" placeholder="Sony FX6"></div>
-    <div class="field"><label>📝 Notițe</label><input id="f-notes" type="text" placeholder="Stabilizator activat"></div>
-    <div class="sheet-actions">
-      <button class="sheet-btn danger" id="reset-fields-btn">🔄 Resetează</button>
-      <button class="sheet-btn primary" id="save-fields-btn">Salvează</button>
+<section class="wrap" id="about">
+  <div class="section-title">
+    <h2 data-t="about_title"></h2>
+  </div>
+  <p class="about-text" data-t="about_text"></p>
+</section>
+
+<section class="wrap" id="features">
+  <div class="section-title">
+    <h2 data-t="features_title"></h2>
+    <p data-t="features_sub"></p>
+  </div>
+  <div class="grid" id="features-grid"></div>
+</section>
+
+<section class="wrap" id="how">
+  <div class="section-title">
+    <h2 data-t="how_title"></h2>
+  </div>
+  <div class="steps" id="steps-list"></div>
+</section>
+
+<section class="wrap" id="download">
+  <div class="section-title">
+    <h2 data-t="download_title"></h2>
+    <p data-t="download_sub"></p>
+  </div>
+  <div class="platforms">
+    <div class="platform-card">
+      <div class="plat-icon">🍎</div>
+      <div class="plat-name">macOS</div>
+      <div class="plat-file">ClapperboardDigital.pkg</div>
+      <p class="plat-note" data-t="mac_hint"></p>
+      <a class="btn btn-secondary" href="https://github.com/gordasgdc/clapperboard-digital/releases/latest" data-t="cta_download"></a>
+    </div>
+    <div class="platform-card">
+      <div class="plat-icon">🪟</div>
+      <div class="plat-name">Windows</div>
+      <div class="plat-file">ClapperboardDigital.exe</div>
+      <p class="plat-note" data-t="win_hint"></p>
+      <a class="btn btn-secondary" href="https://github.com/gordasgdc/clapperboard-digital/releases/latest" data-t="cta_download"></a>
     </div>
   </div>
-</div>
+  <p class="about-text" style="margin-top:22px; font-size:12.5px;" data-t="ffmpeg_note"></p>
+</section>
 
-<div class="overlay" id="tc-overlay">
-  <div class="sheet">
-    <div class="sheet-header"><h2>⏱ Setează timecode</h2><button class="icon-btn" id="close-tc-btn">✕</button></div>
-    <div class="field-grid">
-      <div class="field"><label>HH</label><input id="tc-hh" type="number" min="0" max="23" inputmode="numeric"></div>
-      <div class="field"><label>MM</label><input id="tc-mm" type="number" min="0" max="59" inputmode="numeric"></div>
-      <div class="field"><label>SS</label><input id="tc-ss" type="number" min="0" max="59" inputmode="numeric"></div>
-      <div class="field"><label>FF</label><input id="tc-ff" type="number" min="0" max="29" inputmode="numeric"></div>
-    </div>
-    <div class="field">
-      <label>Cadre pe secundă (fps)</label>
-      <select id="tc-fps">
-        <option value="24">24</option>
-        <option value="25">25</option>
-        <option value="30">30</option>
-      </select>
-    </div>
-    <div class="sheet-actions">
-      <button class="sheet-btn" id="tc-sync-now-btn">🔄 Sincronizează cu ora sistemului</button>
-      <button class="sheet-btn primary" id="tc-save-btn">Salvează</button>
-    </div>
+<footer class="wrap">
+  <div data-t="footer_line"></div>
+  <div style="margin-top:8px;">
+    <a href="https://github.com/gordasgdc">GitHub</a> ·
+    <a href="https://web.facebook.com/cristiGDC">Facebook</a> ·
+    <a href="https://www.youtube.com/@cristigordas">YouTube</a>
   </div>
-</div>
+</footer>
 
-<div class="overlay" id="history-overlay">
-  <div class="sheet">
-    <div class="sheet-header"><h2>📜 Istoric take-uri</h2><button class="icon-btn" id="close-history-btn">✕</button></div>
-    <div class="history-list" id="history-list"></div>
-    <div class="sheet-actions">
-      <button class="sheet-btn danger" id="clear-history-btn" style="width:100%;">🗑 Șterge istoricul</button>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="qr-overlay">
-  <div class="sheet">
-    <div class="sheet-header"><h2>▦ Cod QR</h2><button class="icon-btn" id="close-qr-btn">✕</button></div>
-    <div class="qr-wrap">
-      <canvas id="qr-canvas" width="230" height="230"></canvas>
-      <p>Scanează pentru proiect, scenă, take și timecode</p>
-    </div>
-  </div>
-</div>
-
-<div class="overlay" id="export-overlay">
-  <div class="sheet">
-    <div class="sheet-header"><h2>⤓ Exportă metadate</h2><button class="icon-btn" id="close-export-btn">✕</button></div>
-    <p style="font-size:13px; color:var(--muted); margin-top:0;">
-      Exportă toate take-urile înregistrate ca fișier pentru montaj sau import parțial în DaVinci Resolve.
-      Coloana <strong>File Name</strong> rămâne goală — completeaz-o manual cu numele fișierelor după ingest,
-      apoi folosește <em>Media Pool → Metadata → Import</em> în Resolve.
-    </p>
-    <div class="sheet-actions">
-      <button class="sheet-btn" id="export-csv-btn">📄 CSV (Resolve)</button>
-      <button class="sheet-btn" id="export-json-btn">🧾 JSON</button>
-    </div>
-  </div>
-</div>
-
-<div class="install-banner" id="install-banner">
-  <p>📲 Adaugă Clapperboard Digital pe ecranul de pornire pentru acces instant, fără bara de browser.</p>
-  <button class="install-yes" id="install-yes-btn">Instalează</button>
-  <button class="install-no" id="install-no-btn">✕</button>
-</div>
-
-<div class="toast" id="toast"></div>
+<div class="stripes"></div>
 
 <script>
-(function () {
-  "use strict";
+const T = {
+  ro: {
+    eyebrow: "Înlocuiește clasica clapetă",
+    hero_title: 'Clapeta digitală pentru <span class="accent">platoul de filmare</span>',
+    hero_sub: "Completează proiectul, scena și take-ul, vezi ecranul actualizat instant și exportă-l ca video, PDF sau imagine — direct pe platou.",
+    cta_download: "Descarcă ultima versiune",
+    cta_source: "Cod sursă (GitHub)",
+    about_title: "Despre aplicație",
+    about_text: "Clapperboard Digital generează, în timp real, ecranul cu informațiile filmării — proiect, scenă, take, regizor, cameră, dată și oră — pe care îl filmezi la începutul fiecărui clip, ca referință pentru montaj. Rulează local, nu are nevoie de cont sau conexiune la internet.",
+    features_title: "Caracteristici",
+    features_sub: "Simplă, rapidă, gândită pentru ritmul unui platou de filmare.",
+    features: [
+      ["👁️", "Previzualizare live", "Vezi instant cum arată ecranul, pe măsură ce completezi câmpurile."],
+      ["🎞️", "Export video", "MOV (ProRes) sau MP4 (H.264), cu durată personalizabilă."],
+      ["📄", "Export PDF", "Un document curat, cu toate informațiile filmării, gata de printat."],
+      ["🖼️", "Export imagine", "PNG la rezoluție 1920×1080, pentru orice alt flux de lucru."],
+      ["🔢", "Take rapid", "Butoane +/− pentru a avansa numărul de take fără să ștergi nimic."],
+      ["🌍", "RO / EN / ES", "Interfață completă în trei limbi, comutabilă fără repornire."],
+    ],
+    how_title: "Cum funcționează",
+    steps: [
+      ["📦", "Descarcă aplicația de pe GitHub Releases"],
+      ["🖥️", "Instalează (.pkg pe Mac, .exe pe Windows)"],
+      ["✏️", "Completează proiectul, scena, take-ul și restul informațiilor"],
+      ["👁️", "Verifică previzualizarea live din partea dreaptă"],
+      ["🎬", "Exportă ca video, PDF sau imagine și filmează ecranul"],
+    ],
+    download_title: "Descarcă și instalează",
+    download_sub: "Alege pachetul pentru sistemul tău din ultima versiune de pe GitHub.",
+    mac_hint: "Dublu-click pe .pkg și urmează instalatorul.",
+    win_hint: "Dublu-click pe .exe pentru a rula aplicația.",
+    ffmpeg_note: "Exportul video necesită FFmpeg instalat separat pe sistem. Exportul PDF și imagine funcționează fără nicio dependință suplimentară.",
+    footer_line: "Clapperboard Digital · gratuit și open-source (MIT) · realizat de Cristi Gordas",
+  },
+  en: {
+    eyebrow: "Replaces the classic clapperboard",
+    hero_title: 'The digital slate for <span class="accent">the film set</span>',
+    hero_sub: "Fill in the project, scene, and take, watch the screen update instantly, and export it as video, PDF, or image — right on set.",
+    cta_download: "Download latest version",
+    cta_source: "Source code (GitHub)",
+    about_title: "About the app",
+    about_text: "Clapperboard Digital generates, in real time, the shoot-information screen — project, scene, take, director, camera, date and time — that you film at the start of every clip as an editing reference. Runs entirely locally, no account or internet connection needed.",
+    features_title: "Features",
+    features_sub: "Simple, fast, built for the pace of a film set.",
+    features: [
+      ["👁️", "Live preview", "See the screen update instantly as you fill in the fields."],
+      ["🎞️", "Video export", "MOV (ProRes) or MP4 (H.264), with a customizable duration."],
+      ["📄", "PDF export", "A clean document with all the shoot info, ready to print."],
+      ["🖼️", "Image export", "1920×1080 PNG, for any other workflow."],
+      ["🔢", "Quick take", "+/− buttons to advance the take number without retyping."],
+      ["🌍", "RO / EN / ES", "Full interface in three languages, switchable without restarting."],
+    ],
+    how_title: "How it works",
+    steps: [
+      ["📦", "Download the app from GitHub Releases"],
+      ["🖥️", "Install (.pkg on Mac, .exe on Windows)"],
+      ["✏️", "Fill in the project, scene, take and the rest of the info"],
+      ["👁️", "Check the live preview on the right"],
+      ["🎬", "Export as video, PDF, or image and film the screen"],
+    ],
+    download_title: "Download & install",
+    download_sub: "Pick the package for your system from the latest GitHub release.",
+    mac_hint: "Double-click the .pkg and follow the installer.",
+    win_hint: "Double-click the .exe to run the app.",
+    ffmpeg_note: "Video export requires FFmpeg installed separately on your system. PDF and image export work with no extra dependencies.",
+    footer_line: "Clapperboard Digital · free & open-source (MIT) · built by Cristi Gordas",
+  },
+  es: {
+    eyebrow: "Sustituye a la claqueta clásica",
+    hero_title: 'La claqueta digital para <span class="accent">el set de rodaje</span>',
+    hero_sub: "Completa el proyecto, la escena y la toma, mira cómo se actualiza la pantalla al instante y expórtala como vídeo, PDF o imagen — directamente en el set.",
+    cta_download: "Descargar última versión",
+    cta_source: "Código fuente (GitHub)",
+    about_title: "Sobre la aplicación",
+    about_text: "Clapperboard Digital genera, en tiempo real, la pantalla con la información del rodaje — proyecto, escena, toma, director, cámara, fecha y hora — que filmas al inicio de cada clip como referencia de montaje. Funciona en local, sin cuenta ni conexión a internet.",
+    features_title: "Características",
+    features_sub: "Simple, rápida, pensada para el ritmo de un set de rodaje.",
+    features: [
+      ["👁️", "Vista previa en vivo", "Ve la pantalla actualizarse al instante mientras rellenas los campos."],
+      ["🎞️", "Exportación de vídeo", "MOV (ProRes) o MP4 (H.264), con duración personalizable."],
+      ["📄", "Exportación PDF", "Un documento limpio con toda la información del rodaje, listo para imprimir."],
+      ["🖼️", "Exportación de imagen", "PNG a 1920×1080, para cualquier otro flujo de trabajo."],
+      ["🔢", "Toma rápida", "Botones +/− para avanzar el número de toma sin volver a escribir."],
+      ["🌍", "RO / EN / ES", "Interfaz completa en tres idiomas, cambiable sin reiniciar."],
+    ],
+    how_title: "Cómo funciona",
+    steps: [
+      ["📦", "Descarga la app desde GitHub Releases"],
+      ["🖥️", "Instala (.pkg en Mac, .exe en Windows)"],
+      ["✏️", "Rellena el proyecto, la escena, la toma y el resto de datos"],
+      ["👁️", "Comprueba la vista previa en vivo a la derecha"],
+      ["🎬", "Exporta como vídeo, PDF o imagen y filma la pantalla"],
+    ],
+    download_title: "Descargar e instalar",
+    download_sub: "Elige el paquete para tu sistema desde la última versión de GitHub.",
+    mac_hint: "Haz doble clic en el .pkg y sigue el instalador.",
+    win_hint: "Haz doble clic en el .exe para ejecutar la app.",
+    ffmpeg_note: "La exportación de vídeo requiere FFmpeg instalado por separado en tu sistema. La exportación de PDF e imagen funciona sin dependencias adicionales.",
+    footer_line: "Clapperboard Digital · gratis y de código abierto (MIT) · creado por Cristi Gordas",
+  },
+};
 
-  const STATE_KEY = "clapperboard_state_v2";
-  const HISTORY_KEY = "clapperboard_history";
-  const MAX_HISTORY = 200;
+let lang = localStorage.getItem("clapperboard_docs_lang") || "ro";
 
-  function loadState() {
-    try {
-      const raw = localStorage.getItem(STATE_KEY);
-      const parsed = raw ? JSON.parse(raw) : {};
-      return Object.assign({
-        project: "", scene: "", take: 1, director: "", camera: "", notes: "",
-        fps: 25, tcOffsetMs: 0,
-      }, parsed);
-    } catch (e) {
-      return { project: "", scene: "", take: 1, director: "", camera: "", notes: "", fps: 25, tcOffsetMs: 0 };
-    }
-  }
+const SLATE_LABELS = {
+  ro: ["Proiect", "Scenă", "Take", "Regizor", "Cameră"],
+  en: ["Project", "Scene", "Take", "Director", "Camera"],
+  es: ["Proyecto", "Escena", "Toma", "Director", "Cámara"],
+};
 
-  let state = loadState();
-  function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
-
-  function loadHistory() {
-    try {
-      const raw = localStorage.getItem(HISTORY_KEY);
-      const parsed = raw ? JSON.parse(raw) : [];
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (e) { return []; }
-  }
-  function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY))); }
-  let history = loadHistory();
-
-  function currentTimecode() {
-    const now = Date.now() + state.tcOffsetMs;
-    const d = new Date(now);
-    const fps = state.fps || 25;
-    const ff = Math.floor((d.getMilliseconds() / 1000) * fps);
-    return { hh: d.getHours(), mm: d.getMinutes(), ss: d.getSeconds(), ff, fps };
-  }
-
-  function pad(n) { return String(n).padStart(2, "0"); }
-  function formatTimecode(tc) { return `${pad(tc.hh)}:${pad(tc.mm)}:${pad(tc.ss)}:${pad(tc.ff)}`; }
-
-  function renderTimecode() {
-    const tc = currentTimecode();
-    document.getElementById("tc-digits").innerHTML =
-      `${pad(tc.hh)}:${pad(tc.mm)}:${pad(tc.ss)}<span class="frames">:${pad(tc.ff)}</span>`;
-  }
-  setInterval(renderTimecode, 1000 / 25);
-  renderTimecode();
-
-  function renderClock() {
-    const now = new Date();
-    document.getElementById("disp-date").textContent = now.toISOString().slice(0, 10);
-    document.getElementById("disp-clock").textContent = now.toTimeString().slice(0, 8);
-  }
-  renderClock();
-  setInterval(() => { renderClock(); renderQr(); }, 1000);
-
-  function renderFields() {
-    document.getElementById("disp-project").textContent = state.project || "Atinge pentru a completa proiectul";
-    document.getElementById("disp-scene").textContent = state.scene ? `Scena ${state.scene}` : "Scena —";
-    document.getElementById("disp-take").textContent = `Take ${state.take}`;
-    document.getElementById("disp-camera").textContent = state.camera || "Cameră —";
-  }
-  renderFields();
-
-  function currentData() {
-    const tc = currentTimecode();
-    const now = new Date();
-    return {
-      project: state.project, scene: state.scene, take: state.take,
-      director: state.director, camera: state.camera, notes: state.notes,
-      timecode: formatTimecode(tc),
-      date: now.toISOString().slice(0, 10),
-      time: now.toTimeString().slice(0, 8),
-    };
-  }
-
-  let qrDebounce = null;
-  function renderQr() {
-    if (qrDebounce) clearTimeout(qrDebounce);
-    qrDebounce = setTimeout(() => {
-      const canvas = document.getElementById("qr-canvas");
-      if (!window.QRCode || !canvas) return;
-      QRCode.toCanvas(canvas, JSON.stringify(currentData()), { width: 230, margin: 1, color: { dark: "#0a0a0c", light: "#ffffff" } }, () => {});
-    }, 120);
-  }
-
-  let toastTimer = null;
-  function showToast(msg) {
-    const toast = document.getElementById("toast");
-    toast.textContent = msg;
-    toast.classList.add("show");
-    if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
-  }
-  function flashScreen() {
-    const flash = document.getElementById("flash");
-    flash.classList.add("on");
-    setTimeout(() => flash.classList.remove("on"), 110);
-  }
-
-  let audioCtx = null;
-  function playClapSound() {
-    try {
-      const Ctx = window.AudioContext || window.webkitAudioContext;
-      if (!audioCtx) audioCtx = new Ctx();
-      if (audioCtx.state === "suspended") audioCtx.resume();
-
-      const bufferSize = Math.floor(audioCtx.sampleRate * 0.18);
-      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2.2);
-      }
-      const noise = audioCtx.createBufferSource();
-      noise.buffer = buffer;
-
-      const bandpass = audioCtx.createBiquadFilter();
-      bandpass.type = "bandpass";
-      bandpass.frequency.value = 1800;
-      bandpass.Q.value = 0.6;
-
-      const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(1.4, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
-
-      const thump = audioCtx.createOscillator();
-      thump.type = "sine";
-      thump.frequency.setValueAtTime(160, audioCtx.currentTime);
-      thump.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.09);
-      const thumpGain = audioCtx.createGain();
-      thumpGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-      thumpGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-
-      noise.connect(bandpass).connect(gain).connect(audioCtx.destination);
-      thump.connect(thumpGain).connect(audioCtx.destination);
-
-      noise.start(); noise.stop(audioCtx.currentTime + 0.2);
-      thump.start(); thump.stop(audioCtx.currentTime + 0.12);
-
-      if (navigator.vibrate) navigator.vibrate([0, 40]);
-    } catch (e) { /* Web Audio unavailable — silent no-op */ }
-  }
-
-  document.getElementById("clap-btn").addEventListener("click", () => {
-    if (!state.project) {
-      showToast("Completează proiectul înainte de CLAP (✏️)");
-      openOverlay("edit-overlay");
-      populateEditSheet();
-      return;
-    }
-    const data = currentData();
-    history.unshift({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      project: data.project, scene: data.scene, take: data.take,
-      director: data.director, camera: data.camera, notes: data.notes,
-      timecode: data.timecode, date: data.date, time: data.time,
-    });
-    saveHistory();
-
-    playClapSound();
-    flashScreen();
-    showToast(`Take ${data.take} înregistrat — ${data.timecode}`);
-
-    state.take += 1;
-    saveState();
-    renderFields();
-    renderQr();
+function render() {
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-t]").forEach(el => {
+    const key = el.getAttribute("data-t");
+    if (d[key] !== undefined) el.innerHTML = d[key];
   });
+  document.querySelectorAll(".lang-btn").forEach(b => b.classList.toggle("active", b.dataset.lang === lang));
 
-  document.getElementById("take-plus").addEventListener("click", () => {
-    state.take += 1; saveState(); renderFields(); renderQr();
+  const labels = SLATE_LABELS[lang];
+  document.getElementById("slate-project-label").textContent = labels[0];
+  document.getElementById("slate-scene-label").textContent = labels[1];
+  document.getElementById("slate-take-label").textContent = labels[2];
+  document.getElementById("slate-director-label").textContent = labels[3];
+  document.getElementById("slate-camera-label").textContent = labels[4];
+
+  document.getElementById("features-grid").innerHTML = d.features.map(f => `
+    <div class="feature"><div class="icon">${f[0]}</div><h3>${f[1]}</h3><p>${f[2]}</p></div>
+  `).join("");
+
+  document.getElementById("steps-list").innerHTML = d.steps.map((s, i) => `
+    <div class="step"><div class="num">${i + 1}</div><div class="txt"><strong>${s[0]} ${s[1]}</strong></div></div>
+  `).join("");
+}
+
+document.querySelectorAll(".lang-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    lang = btn.dataset.lang;
+    localStorage.setItem("clapperboard_docs_lang", lang);
+    render();
   });
-  document.getElementById("take-minus").addEventListener("click", () => {
-    state.take = Math.max(1, state.take - 1); saveState(); renderFields(); renderQr();
-  });
+});
 
-  function openOverlay(id) { document.getElementById(id).classList.add("open"); }
-  function closeOverlay(id) { document.getElementById(id).classList.remove("open"); }
-  function closeAllOverlays() {
-    document.querySelectorAll(".overlay.open").forEach(el => el.classList.remove("open"));
-  }
-
-  function populateEditSheet() {
-    document.getElementById("f-project").value = state.project;
-    document.getElementById("f-scene").value = state.scene;
-    document.getElementById("f-director").value = state.director;
-    document.getElementById("f-camera").value = state.camera;
-    document.getElementById("f-notes").value = state.notes;
-  }
-
-  document.getElementById("edit-btn").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
-  document.getElementById("row-project").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
-  document.getElementById("row-scene").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
-  document.getElementById("row-camera").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
-  document.getElementById("close-edit-btn").addEventListener("click", () => closeOverlay("edit-overlay"));
-
-  document.getElementById("save-fields-btn").addEventListener("click", () => {
-    state.project = document.getElementById("f-project").value.trim();
-    state.scene = document.getElementById("f-scene").value.trim();
-    state.director = document.getElementById("f-director").value.trim();
-    state.camera = document.getElementById("f-camera").value.trim();
-    state.notes = document.getElementById("f-notes").value.trim();
-    saveState();
-    renderFields();
-    renderQr();
-    closeOverlay("edit-overlay");
-    showToast("Salvat");
-  });
-
-  document.getElementById("reset-fields-btn").addEventListener("click", () => {
-    if (!confirm("Resetezi toate câmpurile?")) return;
-    state.project = ""; state.scene = ""; state.director = ""; state.camera = ""; state.notes = ""; state.take = 1;
-    saveState();
-    renderFields();
-    renderQr();
-    populateEditSheet();
-    showToast("Câmpuri resetate");
-  });
-
-  document.getElementById("tc-block").addEventListener("click", () => {
-    const tc = currentTimecode();
-    document.getElementById("tc-hh").value = tc.hh;
-    document.getElementById("tc-mm").value = tc.mm;
-    document.getElementById("tc-ss").value = tc.ss;
-    document.getElementById("tc-ff").value = tc.ff;
-    document.getElementById("tc-fps").value = String(state.fps || 25);
-    openOverlay("tc-overlay");
-  });
-  document.getElementById("close-tc-btn").addEventListener("click", () => closeOverlay("tc-overlay"));
-
-  document.getElementById("tc-save-btn").addEventListener("click", () => {
-    const hh = Math.min(23, Math.max(0, parseInt(document.getElementById("tc-hh").value, 10) || 0));
-    const mm = Math.min(59, Math.max(0, parseInt(document.getElementById("tc-mm").value, 10) || 0));
-    const ss = Math.min(59, Math.max(0, parseInt(document.getElementById("tc-ss").value, 10) || 0));
-    const fps = parseInt(document.getElementById("tc-fps").value, 10) || 25;
-    const ff = Math.min(fps - 1, Math.max(0, parseInt(document.getElementById("tc-ff").value, 10) || 0));
-
-    state.fps = fps;
-
-    const now = new Date();
-    const target = new Date(now);
-    target.setHours(hh, mm, ss, Math.round((ff / fps) * 1000));
-
-    state.tcOffsetMs = target.getTime() - now.getTime();
-    saveState();
-    renderTimecode();
-    closeOverlay("tc-overlay");
-    showToast("Timecode setat");
-  });
-
-  document.getElementById("tc-sync-now-btn").addEventListener("click", () => {
-    state.tcOffsetMs = 0;
-    saveState();
-    renderTimecode();
-    closeOverlay("tc-overlay");
-    showToast("Sincronizat cu ora sistemului");
-  });
-
-  document.getElementById("history-btn").addEventListener("click", () => { renderHistoryList(); openOverlay("history-overlay"); });
-  document.getElementById("close-history-btn").addEventListener("click", () => closeOverlay("history-overlay"));
-
-  document.getElementById("clear-history-btn").addEventListener("click", () => {
-    if (!confirm("Ștergi tot istoricul de take-uri? Acțiunea nu poate fi anulată.")) return;
-    history = [];
-    saveHistory();
-    renderHistoryList();
-    showToast("Istoric șters");
-  });
-
-  function escapeHtml(str) {
-    const div = document.createElement("div");
-    div.textContent = str || "";
-    return div.innerHTML;
-  }
-
-  function renderHistoryList() {
-    const list = document.getElementById("history-list");
-    if (!history.length) {
-      list.innerHTML = '<div class="history-empty">Niciun take înregistrat încă.<br>Apasă CLAP pentru a începe.</div>';
-      return;
-    }
-    list.innerHTML = history.map(h => `
-      <div class="history-item" data-id="${h.id}">
-        <div class="info">
-          <strong>${escapeHtml(h.project)}${h.scene ? " · " + escapeHtml(h.scene) : ""}</strong>
-          <span>${escapeHtml(h.timecode || "")} · ${escapeHtml(h.date)} ${escapeHtml(h.time || "")}</span>
-        </div>
-        <div class="badge">Take ${h.take}</div>
-      </div>
-    `).join("");
-
-    list.querySelectorAll(".history-item").forEach(item => {
-      item.addEventListener("click", () => {
-        const entry = history.find(h => h.id === item.dataset.id);
-        if (!entry) return;
-        state.project = entry.project; state.scene = entry.scene;
-        state.director = entry.director; state.camera = entry.camera; state.notes = entry.notes;
-        state.take = entry.take + 1;
-        saveState();
-        renderFields();
-        renderQr();
-        closeOverlay("history-overlay");
-        showToast("Detalii încărcate din istoric");
-      });
-    });
-  }
-
-  document.getElementById("qr-btn").addEventListener("click", () => { renderQr(); openOverlay("qr-overlay"); });
-  document.getElementById("close-qr-btn").addEventListener("click", () => closeOverlay("qr-overlay"));
-
-  document.getElementById("export-btn").addEventListener("click", () => openOverlay("export-overlay"));
-  document.getElementById("close-export-btn").addEventListener("click", () => closeOverlay("export-overlay"));
-
-  function downloadBlob(content, filename, mime) {
-    const blob = new Blob([content], { type: mime });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  function csvEscape(value) {
-    const str = String(value == null ? "" : value);
-    if (/[",\n]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
-    return str;
-  }
-
-  document.getElementById("export-csv-btn").addEventListener("click", () => {
-    if (!history.length) { showToast("Niciun take de exportat"); return; }
-    const headers = ["File Name", "Project", "Scene", "Take", "Timecode", "Date", "Time", "Director", "Camera", "Notes"];
-    const rows = history.slice().reverse().map(h => [
-      "", h.project, h.scene, h.take, h.timecode || "", h.date, h.time || "", h.director || "", h.camera || "", h.notes || "",
-    ]);
-    const csv = [headers, ...rows].map(row => row.map(csvEscape).join(",")).join("\r\n");
-    const stamp = new Date().toISOString().slice(0, 10);
-    downloadBlob(csv, `clapperboard-metadata-${stamp}.csv`, "text/csv;charset=utf-8");
-    showToast("CSV exportat");
-    closeOverlay("export-overlay");
-  });
-
-  document.getElementById("export-json-btn").addEventListener("click", () => {
-    if (!history.length) { showToast("Niciun take de exportat"); return; }
-    const data = history.slice().reverse();
-    const stamp = new Date().toISOString().slice(0, 10);
-    downloadBlob(JSON.stringify(data, null, 2), `clapperboard-metadata-${stamp}.json`, "application/json");
-    showToast("JSON exportat");
-    closeOverlay("export-overlay");
-  });
-
-  function isFullscreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
-
-  function requestFs() {
-    const el = document.documentElement;
-    const req = el.requestFullscreen || el.webkitRequestFullscreen;
-    if (req && !isFullscreen()) {
-      try { const p = req.call(el); if (p && p.catch) p.catch(() => {}); } catch (e) {}
-    }
-  }
-  function exitFs() {
-    if (isFullscreen()) {
-      const exit = document.exitFullscreen || document.webkitExitFullscreen;
-      if (exit) { try { exit.call(document); } catch (e) {} }
-    }
-  }
-
-  document.getElementById("fullscreen-btn").addEventListener("click", () => {
-    if (isFullscreen()) exitFs(); else requestFs();
-  });
-
-  function firstTapFullscreen(e) {
-    if (e.target.closest(".overlay")) return;
-    requestFs();
-    document.removeEventListener("click", firstTapFullscreen);
-  }
-  document.addEventListener("click", firstTapFullscreen);
-
-  document.getElementById("slate").addEventListener("click", (e) => {
-    if (e.target.id === "slate" || e.target.classList.contains("stripes")) {
-      exitFs();
-    }
-  });
-
-  document.addEventListener("keydown", (e) => {
-    const tag = document.activeElement && document.activeElement.tagName;
-    const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
-
-    if (e.key === "Escape") {
-      if (document.querySelector(".overlay.open")) { closeAllOverlays(); return; }
-      exitFs();
-      return;
-    }
-    if (typing) return;
-
-    if (e.key === "+" || e.key === "=") document.getElementById("take-plus").click();
-    else if (e.key === "-" || e.key === "_") document.getElementById("take-minus").click();
-    else if (e.key === " ") { e.preventDefault(); document.getElementById("clap-btn").click(); }
-    else if (e.key === "f" || e.key === "F") { if (isFullscreen()) exitFs(); else requestFs(); }
-    else if (e.key === "h" || e.key === "H") { renderHistoryList(); openOverlay("history-overlay"); }
-  });
-
-  let deferredPrompt = null;
-  const installBanner = document.getElementById("install-banner");
-  window.addEventListener("beforeinstallprompt", (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (!localStorage.getItem("clapperboard_install_dismissed")) installBanner.classList.add("show");
-  });
-  document.getElementById("install-yes-btn").addEventListener("click", async () => {
-    installBanner.classList.remove("show");
-    if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
-  });
-  document.getElementById("install-no-btn").addEventListener("click", () => {
-    installBanner.classList.remove("show");
-    localStorage.setItem("clapperboard_install_dismissed", "1");
-  });
-
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("sw.js").catch(() => {});
-    });
-    let refreshedOnce = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (refreshedOnce) return;
-      refreshedOnce = true;
-      window.location.reload();
-    });
-  }
-})();
+render();
 </script>
 </body>
 </html>

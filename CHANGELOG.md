@@ -2,6 +2,17 @@
 
 All notable changes to Clapperboard Digital are documented here.
 
+## [1.1.0] — Unreleased
+
+### Added
+- **Quick templates**: Nuntă, Reclamă, Interviu, Documentar built in, with `{placeholder}` prompts (e.g. "Nunta {client}"); fully manageable (add/edit/delete) from Settings
+- **Take history**: tracks the highest take reached per project/scene, viewable and reloadable from Settings → Istoric take-uri
+- **QR code embedding**: optional checkbox to bake a scannable QR (project/scene/take/director/camera/date/time) into the generated screen, video, and PDF exports
+- **Fullscreen slate view**: dedicated fullscreen window for filming the screen directly, exit via Esc or click
+- **Appearance customization**: background/text/accent/footer colors, sans-serif or serif font, optional logo overlay — Settings → Personalizare aspect
+- **Import from GDC Production Manager**: pick a project from a GDC PM JSON export to prefill the slate
+- Window resized to fit all the new controls without clipping
+
 ## [1.0.0] — Unreleased
 
 First public version.

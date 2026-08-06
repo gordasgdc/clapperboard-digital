@@ -63,6 +63,49 @@ TRANSLATIONS = {
             "exportabil ca video, PDF sau imagine.\n\n"
             "© Cristi Gordas (GDC)"
         ),
+
+        "menu_settings": "Setări",
+        "menu_customize": "Personalizare aspect…",
+        "menu_manage_templates": "Gestionează șabloane…",
+        "menu_history": "Istoric take-uri…",
+        "menu_import_gdc": "Importă din GDC Production Manager…",
+
+        "templates_label": "📋 Șabloane rapide",
+        "qr_checkbox_label": "Include cod QR pe ecran",
+        "btn_fullscreen": "⛶ Ecran complet",
+
+        "new_template_name": "Nume șablon:",
+        "add_template_btn": "➕ Adaugă șablon",
+
+        "no_history": "Niciun istoric încă.",
+        "load_history_btn": "Încarcă",
+        "clear_history_btn": "🗑 Șterge istoric",
+        "confirm_clear_history": "Ștergi tot istoricul de take-uri? Acțiunea nu poate fi anulată.",
+
+        "customize_title": "Personalizare aspect",
+        "customize_bg": "Culoare fundal",
+        "customize_text": "Culoare text",
+        "customize_accent": "Culoare accent (dungi/etichete)",
+        "customize_footer": "Culoare footer",
+        "customize_font": "Font",
+        "customize_font_sans": "Sans-serif (implicit)",
+        "customize_font_serif": "Serif",
+        "customize_logo": "Logo (PNG, opțional)",
+        "customize_choose_logo": "Alege fișier…",
+        "customize_remove_logo": "Elimină logo",
+        "customize_save": "Salvează",
+        "customize_reset": "Resetează la implicit",
+        "customize_saved": "Personalizare salvată",
+
+        "import_gdc_title": "Importă din GDC Production Manager",
+        "import_gdc_choose_file": "Alege fișierul export JSON…",
+        "import_gdc_select_project": "Selectează un proiect:",
+        "import_gdc_import_btn": "Importă",
+        "import_gdc_invalid_file": "Fișierul nu este un export valid din GDC Production Manager.",
+        "import_gdc_no_projects": "Fișierul nu conține niciun proiect.",
+        "import_gdc_success": "Proiect importat cu succes.",
+
+        "fullscreen_hint": "Apasă ESC sau click pentru a ieși",
     },
     "en": {
         "app_title": "Clapperboard Digital",
@@ -124,6 +167,49 @@ TRANSLATIONS = {
             "as video, PDF, or image.\n\n"
             "© Cristi Gordas (GDC)"
         ),
+
+        "menu_settings": "Settings",
+        "menu_customize": "Customize appearance…",
+        "menu_manage_templates": "Manage templates…",
+        "menu_history": "Take history…",
+        "menu_import_gdc": "Import from GDC Production Manager…",
+
+        "templates_label": "📋 Quick templates",
+        "qr_checkbox_label": "Include QR code on screen",
+        "btn_fullscreen": "⛶ Fullscreen",
+
+        "new_template_name": "Template name:",
+        "add_template_btn": "➕ Add template",
+
+        "no_history": "No history yet.",
+        "load_history_btn": "Load",
+        "clear_history_btn": "🗑 Clear history",
+        "confirm_clear_history": "Delete all take history? This can't be undone.",
+
+        "customize_title": "Customize appearance",
+        "customize_bg": "Background color",
+        "customize_text": "Text color",
+        "customize_accent": "Accent color (stripes/labels)",
+        "customize_footer": "Footer color",
+        "customize_font": "Font",
+        "customize_font_sans": "Sans-serif (default)",
+        "customize_font_serif": "Serif",
+        "customize_logo": "Logo (PNG, optional)",
+        "customize_choose_logo": "Choose file…",
+        "customize_remove_logo": "Remove logo",
+        "customize_save": "Save",
+        "customize_reset": "Reset to default",
+        "customize_saved": "Appearance saved",
+
+        "import_gdc_title": "Import from GDC Production Manager",
+        "import_gdc_choose_file": "Choose the exported JSON file…",
+        "import_gdc_select_project": "Select a project:",
+        "import_gdc_import_btn": "Import",
+        "import_gdc_invalid_file": "That file isn't a valid GDC Production Manager export.",
+        "import_gdc_no_projects": "The file doesn't contain any projects.",
+        "import_gdc_success": "Project imported successfully.",
+
+        "fullscreen_hint": "Press ESC or click to exit",
     },
     "es": {
         "app_title": "Clapperboard Digital",
@@ -185,6 +271,49 @@ TRANSLATIONS = {
             "exportable como vídeo, PDF o imagen.\n\n"
             "© Cristi Gordas (GDC)"
         ),
+
+        "menu_settings": "Ajustes",
+        "menu_customize": "Personalizar aspecto…",
+        "menu_manage_templates": "Gestionar plantillas…",
+        "menu_history": "Historial de tomas…",
+        "menu_import_gdc": "Importar desde GDC Production Manager…",
+
+        "templates_label": "📋 Plantillas rápidas",
+        "qr_checkbox_label": "Incluir código QR en la pantalla",
+        "btn_fullscreen": "⛶ Pantalla completa",
+
+        "new_template_name": "Nombre de la plantilla:",
+        "add_template_btn": "➕ Añadir plantilla",
+
+        "no_history": "Aún no hay historial.",
+        "load_history_btn": "Cargar",
+        "clear_history_btn": "🗑 Borrar historial",
+        "confirm_clear_history": "¿Eliminar todo el historial de tomas? No se puede deshacer.",
+
+        "customize_title": "Personalizar aspecto",
+        "customize_bg": "Color de fondo",
+        "customize_text": "Color de texto",
+        "customize_accent": "Color de acento (franjas/etiquetas)",
+        "customize_footer": "Color del pie",
+        "customize_font": "Fuente",
+        "customize_font_sans": "Sans-serif (predeterminada)",
+        "customize_font_serif": "Serif",
+        "customize_logo": "Logo (PNG, opcional)",
+        "customize_choose_logo": "Elegir archivo…",
+        "customize_remove_logo": "Quitar logo",
+        "customize_save": "Guardar",
+        "customize_reset": "Restablecer valores predeterminados",
+        "customize_saved": "Aspecto guardado",
+
+        "import_gdc_title": "Importar desde GDC Production Manager",
+        "import_gdc_choose_file": "Elige el archivo JSON exportado…",
+        "import_gdc_select_project": "Selecciona un proyecto:",
+        "import_gdc_import_btn": "Importar",
+        "import_gdc_invalid_file": "Ese archivo no es una exportación válida de GDC Production Manager.",
+        "import_gdc_no_projects": "El archivo no contiene ningún proyecto.",
+        "import_gdc_success": "Proyecto importado correctamente.",
+
+        "fullscreen_hint": "Pulsa ESC o toca la pantalla para salir",
     },
 }
 

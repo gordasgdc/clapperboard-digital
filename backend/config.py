@@ -24,6 +24,17 @@ DEFAULT_SETTINGS = {
     "camera": "",
     "notes": "",
     "last_export_dir": "",
+    "qr_enabled": False,
+    "templates": [],   # populated on first run — see templates.py
+    "history": [],     # recent project/scene sessions — see history.py
+    "customization": {
+        "bg": "#0A0A0C",
+        "text": "#F0F0F0",
+        "accent": "#F5C518",
+        "footer": "#E8483C",
+        "font_style": "sans_bold",
+        "logo_path": "",
+    },
 }
 
 
@@ -51,12 +62,17 @@ SETTINGS_PATH = os.path.join(DATA_DIR, "settings.json")
 
 def load_config() -> dict:
     settings = dict(DEFAULT_SETTINGS)
+    settings["customization"] = dict(DEFAULT_SETTINGS["customization"])
+
     if os.path.exists(SETTINGS_PATH):
         try:
             with open(SETTINGS_PATH, "r", encoding="utf-8") as f:
                 saved = json.load(f)
             if isinstance(saved, dict):
+                custom = saved.pop("customization", None)
                 settings.update(saved)
+                if isinstance(custom, dict):
+                    settings["customization"].update(custom)
         except (json.JSONDecodeError, OSError):
             pass
     return settings

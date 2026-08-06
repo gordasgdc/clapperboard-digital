@@ -20,6 +20,8 @@ a = Analysis(
     hiddenimports=[
         "PIL._tkinter_finder",
         "reportlab.graphics.barcode",
+        "qrcode",
+        "qrcode.image.pil",
     ],
     hookspath=[],
     runtime_hooks=[],
