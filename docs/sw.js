@@ -6,7 +6,7 @@
 // offline. Static assets (manifest, icons) are cache-first, since they
 // rarely change and don't need to be re-fetched every load.
 
-const CACHE_NAME = "clapperboard-pwa-v2";
+const CACHE_NAME = "clapperboard-pwa-v3";
 const APP_SHELL = [
   "./",
   "./index.html",

@@ -1,6 +1,6 @@
 # 🎬 Clapperboard Digital (PWA)
 
-Clapetă digitală pentru platoul de filmare — instalabilă pe telefon, funcționează offline, fără cont sau server.
+Clachetă digitală pentru platoul de filmare — instalabilă pe telefon, funcționează offline, fără cont sau server. Ecranul principal **este** clacheta: timecode mare, proiect, scenă, take, cameră, dată și oră — gata de filmat.
 
 **Live**: https://gordasgdc.github.io/clapperboard-digital/
 
@@ -18,30 +18,47 @@ Clapetă digitală pentru platoul de filmare — instalabilă pe telefon, funcț
 2. Apasă bannerul **"Instalează"** care apare automat, sau
 3. Meniul ⋮ → **"Adaugă pe ecranul de pornire" / "Instalează aplicația"**
 
-După instalare, aplicația se deschide instant, ca orice altă aplicație de pe telefon — inclusiv fără semnal.
+Instalată, aplicația se deschide fără bara de browser (mod `standalone`) — cel mai apropiat lucru de "ecran complet automat" pe care browserele îl permit fără o atingere a utilizatorului.
 
 ## 🚀 Caracteristici
 
-- **Câmpuri rapide** — Proiect, Scenă, Take, Regizor, Cameră, Notițe
-- **Take +/−** — butoane mari, ușor de atins
-- **CLAP** — un singur buton mare: înregistrează take-ul curent (cu sunet și vibrație), apoi avansează automat la următorul
-- **Cod QR** — generat automat, cu toate informațiile filmării, actualizat live
-- **Dată și oră live** — afișate în interfață, actualizate în fiecare secundă; incluse automat în codul QR și în fiecare intrare din istoric, pentru sincronizare precisă în montaj
-- **Istoric** — toate take-urile înregistrate, salvate local pe telefon; atinge o intrare pentru a reîncărca acele informații
-- **Contor Take X/Y** — arată take-ul curent față de totalul înregistrat pentru acel proiect/scenă
-- **Ecran complet** — clapeta ocupă tot ecranul, gata de filmat
-- **Scurtături tastatură** (utile la testare pe desktop): `+` / `-` pentru take, `spațiu` pentru CLAP, `f` pentru ecran complet, `h` pentru istoric, `Esc` pentru ieșire
-- **Funcționează offline** — după prima încărcare, aplicația rulează fără internet
-- **Salvare automată** — toate câmpurile și istoricul se păstrează între sesiuni, local pe dispozitiv
-- **100% local** — nimic nu e trimis către niciun server; toate datele stau în `localStorage`, pe telefonul tău
+- **Clacheta ocupă tot ecranul** — timecode, proiect, scenă, take, cameră, dată/oră, totul mare și lizibil de la distanță
+- **Timecode real** (HH:MM:SS:FF, 24/25/30 fps) — avansează live, sincronizat cu ceasul telefonului; poate fi **setat manual** (jam-sync) atingând timecode-ul, pentru sincronizare cu camera
+- **CLAP** — înregistrează take-ul curent (sunet sintetizat + vibrație), apoi avansează automat la următorul
+- **Sunet îmbunătățit** — Web Audio API, funcționează pe iPhone și Android, cu un "thump" de joasă frecvență adăugat pentru claritate pe difuzoarele mici de telefon
+- **Editare rapidă** — atinge ✏️ sau orice rând (proiect/scenă/cameră) pentru a completa informațiile, fără să părăsești clacheta
+- **Ecran complet** — se activează la prima atingere a ecranului (browserele nu permit activarea automată fără gest); ESC sau atingerea fundalului clachetei iese din mod
+- **Cod QR** — acum într-un panou dedicat (▦), conține proiect/scenă/take/timecode/dată/oră
+- **Istoric** — toate take-urile, cu timecode, salvate local; atinge o intrare pentru a reîncărca acele date
+- **Export metadate** (⤓) — CSV (gândit pentru import parțial în DaVinci Resolve) sau JSON, cu toate take-urile înregistrate
+- **Funcționează offline**, salvare automată în `localStorage`, 100% local
+
+## 📤 Export metadate pentru DaVinci Resolve
+
+Fișierul CSV exportat are coloanele: `File Name, Project, Scene, Take, Timecode, Date, Time, Director, Camera, Notes`.
+
+**Important de știut**: coloana `File Name` rămâne goală. Clacheta digitală nu are acces la fișierele tale video (rulează într-un browser, izolat de sistemul de fișiere), deci nu poate ști automat ce nume de fișier corespunde fiecărui take. După ingest, completează manual acea coloană cu numele fișierelor corespunzătoare, apoi folosește **Media Pool → Metadata → Import** din Resolve pentru a asocia rândurile cu clipurile. E un pas manual, dar fișierul îți oferă deja toate celelalte informații structurate, gata de asociat.
+
+Dacă preferi să scrii propriul script de ingest/matching, JSON-ul exportat conține aceleași date, structurat, fără ambiguități de formatare CSV.
+
+## ⌨️ Scurtături tastatură (utile la testare pe desktop)
+
+| Tastă | Acțiune |
+|---|---|
+| `+` / `-` | Take următor / anterior |
+| `spațiu` | CLAP |
+| `f` | Ecran complet / ieșire |
+| `h` | Istoric |
+| `Esc` | Închide panoul deschis / iese din ecran complet |
 
 ## 🛠️ Tehnologii
 
-- HTML + CSS + JavaScript vanilla — un singur fișier (`index.html`), fără framework
-- [qrcode.js](https://github.com/soldair/node-qrcode) (CDN) pentru generarea codului QR
+- HTML + CSS + JavaScript vanilla — un singur fișier (`index.html`)
+- [qrcode.js](https://github.com/soldair/node-qrcode) (CDN) pentru codul QR
 - `localStorage` pentru persistență (stare curentă + istoric)
 - Web Audio API pentru sunetul de clapetă (sintetizat, fără fișier audio extern)
-- Service Worker (`sw.js`) pentru funcționare offline
+- Fullscreen API pentru ecran complet (browsere care o suportă)
+- Service Worker (`sw.js`, network-first pentru `index.html`) pentru offline + actualizări mereu curente
 - Web App Manifest (`manifest.json`) pentru instalare ca aplicație nativă
 
 ## 📁 Structura
@@ -49,28 +66,26 @@ După instalare, aplicația se deschide instant, ca orice altă aplicație de pe
 ```
 docs/
 ├── index.html      # aplicația completă (HTML + CSS + JS)
-├── manifest.json    # configurație PWA (nume, iconițe, culori)
-├── sw.js             # Service Worker (cache pentru offline)
-├── icon-192.png     # iconiță PWA 192×192
-└── icon-512.png     # iconiță PWA 512×512
+├── manifest.json    # configurație PWA
+├── sw.js             # Service Worker
+├── icon-192.png
+└── icon-512.png
 ```
 
-Găzduită direct din folderul `docs/` al acestui repository, via GitHub Pages.
-
 ## 💻 Rulare locală (dezvoltare)
-
-Orice server static funcționează — de exemplu:
 
 ```bash
 cd docs
 python3 -m http.server 8000
 ```
 
-Apoi deschide `http://localhost:8000`. Service Worker-ul necesită HTTPS sau `localhost` ca să funcționeze (limitare standard de browser).
+Apoi deschide `http://localhost:8000`. Service Worker-ul necesită HTTPS sau `localhost`.
 
-## ⚠️ Notă despre datele salvate
+## ⚠️ Limitări de platformă
 
-Istoricul și câmpurile curente sunt salvate în `localStorage`, **specific fiecărui browser și dispozitiv**. Ștergerea datelor de navigare sau dezinstalarea aplicației șterge și istoricul. Nu există sincronizare între dispozitive — dacă ai nevoie de asta, aplicația desktop **GDC Production Manager** oferă export/import de date.
+- **Ecran complet automat la deschidere** nu e posibil tehnic în niciun browser fără o atingere a utilizatorului — de-asta clacheta intră în ecran complet la prima atingere, nu instant la încărcare. Instalată ca PWA, rulează deja fără bara de browser.
+- **Timecode-ul** e generat de telefon, nu citit dintr-o cameră fizică — folosește "Setează timecode" pentru jam-sync manual dacă ai nevoie de precizie față de camera ta.
+- Istoricul și câmpurile sunt salvate **per dispozitiv/browser**, fără sincronizare între telefoane.
 
 ## 👤 Autor
 
