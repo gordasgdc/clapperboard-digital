@@ -674,6 +674,16 @@
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("sw.js").catch(() => {});
     });
+
+    // When a newly-deployed service worker takes over, reload once so the
+    // page in front of the person is always the current version — without
+    // this, an installed PWA can silently keep showing an old cached build.
+    let refreshedOnce = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshedOnce) return;
+      refreshedOnce = true;
+      window.location.reload();
+    });
   }
 
   // ------------------------------------------------------------- boot up --
