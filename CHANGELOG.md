@@ -2,6 +2,11 @@
 
 All notable changes to Clapperboard Digital are documented here.
 
+## [1.1.1] — Unreleased
+
+### Changed
+- Refined button design: removed emoji clutter from primary action buttons (Generează ecran, Exportă video/PDF, Ecran complet, Resetează), switched them to uppercase labels for a more precise, instrument-panel feel — consistent with the redesigned PWA
+
 ## [1.1.0] — Unreleased
 
 ### Added

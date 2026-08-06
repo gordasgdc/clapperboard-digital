@@ -17,6 +17,12 @@ from clapperboard import ClapperboardGenerator
 from export import Exporter, ExportError, ffmpeg_available
 from config import load_config, save_config, APP_VERSION
 from translations import t
+
+
+def t_upper(lang, key, **kwargs):
+    """Same as t(), but uppercased — used for the primary action buttons to
+    match the precise, device-panel label style used across the product."""
+    return t(lang, key, **kwargs).upper()
 import templates as tpl_mod
 import history as history_mod
 import qr as qr_mod
@@ -234,35 +240,35 @@ class ClapperboardApp:
         btn_frame.pack(fill="x", padx=16, pady=20)
 
         self._btn_generate = tk.Button(
-            btn_frame, text=t(self.lang, "btn_generate"), command=self._regenerate_preview,
+            btn_frame, text=t_upper(self.lang, "btn_generate"), command=self._regenerate_preview,
             bg=COLORS["accent"], fg="#0A1613", relief="flat", font=("Helvetica", 10, "bold"),
             activebackground="#46e2ca", padx=10, pady=8,
         )
         self._btn_generate.pack(fill="x", pady=(0, 8))
 
         self._btn_export_video = tk.Button(
-            btn_frame, text=t(self.lang, "btn_export_video"), command=self._export_video,
+            btn_frame, text=t_upper(self.lang, "btn_export_video"), command=self._export_video,
             bg=COLORS["bg_elevated"], fg=COLORS["text"], relief="flat", font=("Helvetica", 10),
             activebackground=COLORS["border"], padx=10, pady=8,
         )
         self._btn_export_video.pack(fill="x", pady=4)
 
         self._btn_export_pdf = tk.Button(
-            btn_frame, text=t(self.lang, "btn_export_pdf"), command=self._export_pdf,
+            btn_frame, text=t_upper(self.lang, "btn_export_pdf"), command=self._export_pdf,
             bg=COLORS["bg_elevated"], fg=COLORS["text"], relief="flat", font=("Helvetica", 10),
             activebackground=COLORS["border"], padx=10, pady=8,
         )
         self._btn_export_pdf.pack(fill="x", pady=4)
 
         self._btn_fullscreen = tk.Button(
-            btn_frame, text=t(self.lang, "btn_fullscreen"), command=self._show_fullscreen,
+            btn_frame, text=t_upper(self.lang, "btn_fullscreen"), command=self._show_fullscreen,
             bg=COLORS["bg_elevated"], fg=COLORS["amber"], relief="flat", font=("Helvetica", 10),
             activebackground=COLORS["border"], padx=10, pady=8,
         )
         self._btn_fullscreen.pack(fill="x", pady=4)
 
         self._btn_reset = tk.Button(
-            btn_frame, text=t(self.lang, "btn_reset"), command=self._reset_fields,
+            btn_frame, text=t_upper(self.lang, "btn_reset"), command=self._reset_fields,
             bg=COLORS["panel"], fg=COLORS["tally"], relief="flat", font=("Helvetica", 10),
             activebackground=COLORS["bg_elevated"], padx=10, pady=6,
         )
@@ -875,11 +881,11 @@ class ClapperboardApp:
         for key, label_widget in self._field_rows.items():
             label_widget.config(text=t(self.lang, f"field_{key}"))
 
-        self._btn_generate.config(text=t(self.lang, "btn_generate"))
-        self._btn_export_video.config(text=t(self.lang, "btn_export_video"))
-        self._btn_export_pdf.config(text=t(self.lang, "btn_export_pdf"))
-        self._btn_fullscreen.config(text=t(self.lang, "btn_fullscreen"))
-        self._btn_reset.config(text=t(self.lang, "btn_reset"))
+        self._btn_generate.config(text=t_upper(self.lang, "btn_generate"))
+        self._btn_export_video.config(text=t_upper(self.lang, "btn_export_video"))
+        self._btn_export_pdf.config(text=t_upper(self.lang, "btn_export_pdf"))
+        self._btn_fullscreen.config(text=t_upper(self.lang, "btn_fullscreen"))
+        self._btn_reset.config(text=t_upper(self.lang, "btn_reset"))
         self._templates_label.config(text=t(self.lang, "templates_label"))
         self._qr_check.config(text=t(self.lang, "qr_checkbox_label"))
         self._render_template_buttons()

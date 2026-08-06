@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Clapperboard Digital</title>
+<meta name="description" content="Clachetă digitală pentru platoul de filmare — timecode, proiect, scenă și take, gata de filmat.">
+<meta name="theme-color" content="#0a0a0c">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Clapperboard">
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0a0c;
+    --panel:#151517;
+    --panel-2:#1c1c20;
+    --border:#2c2c31;
+    --text:#f0f0f0;
+    --muted:#8a8a92;
+    --yellow:#f5c518;
+    --yellow-ink:#141200;
+    --danger:#e8483c;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none; }
+  button, input, select, textarea{
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    font-family:inherit; color:inherit;
+  }
+  button{ background:none; }
+  html,body{
+    margin:0; padding:0; background:var(--bg); color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    height:100%; overscroll-behavior:none;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+  input, textarea{ user-select:text; }
+
+  .slate{
+    min-height:100vh; min-height:100dvh; display:flex; flex-direction:column;
+    padding: calc(8px + var(--safe-top)) 14px calc(10px + var(--safe-bottom));
+    gap:8px;
+  }
+
+  .topbar{ display:flex; align-items:center; justify-content:space-between; }
+  .brand{ font-size:13px; font-weight:800; letter-spacing:.12em; color:var(--muted); text-transform:uppercase; }
+  .brand .mark{ color:var(--yellow); }
+  .topbar-actions{ display:flex; gap:6px; }
+  .icon-btn{
+    width:38px; height:38px; border-radius:6px; border:1px solid var(--border);
+    background:var(--panel); color:var(--text); font-size:15px;
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background .1s ease;
+  }
+  .icon-btn:active{ background:var(--panel-2); }
+
+  .stripes{
+    height:12px; border-radius:4px;
+    background: repeating-linear-gradient(115deg, var(--yellow) 0 14px, #0a0a0c 14px 28px);
+  }
+
+  .slate-card{
+    flex:0 1 auto; display:flex; flex-direction:column; justify-content:center; gap:1.6vh;
+    background:var(--panel); border:1px solid var(--border); border-top:2px solid var(--yellow);
+    border-radius:10px;
+    padding:2vh 4vw;
+  }
+
+  .tc-block{ text-align:center; cursor:pointer; }
+  .tc-digits{
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size:clamp(34px, 11vw, 80px); font-weight:700; letter-spacing:.005em;
+    color:var(--text); line-height:1; font-variant-numeric:tabular-nums;
+  }
+  .tc-digits .frames{ color:var(--yellow); }
+  .tc-label{
+    margin-top:6px; font-size:10px; letter-spacing:.2em; color:var(--muted);
+    font-weight:700; text-transform:uppercase;
+  }
+
+  .info-rows{ display:flex; flex-direction:column; gap:0; }
+  .info-row{
+    display:flex; align-items:center; gap:12px; cursor:pointer;
+    padding:7px 6px; border-radius:4px; border-bottom:1px solid var(--border);
+  }
+  .info-row:last-child, .info-row.datetime-row{ border-bottom:none; }
+  .info-row:active{ background:var(--panel-2); }
+  .info-row .ic{ font-size:clamp(14px,2.8vw,18px); flex:none; width:1.4em; text-align:center; opacity:.85; }
+  .info-row .val{
+    font-size:clamp(15px,3.8vw,22px); font-weight:600; color:var(--text);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .datetime-row .val{ font-size:clamp(12px,2.8vw,15px); font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .datetime-row{ gap:8px; flex-wrap:wrap; padding-top:10px; }
+
+  .action-row{ display:flex; gap:8px; align-items:stretch; }
+  .take-btn{
+    flex:1; min-height:54px; border-radius:6px; border:1px solid var(--border);
+    background:var(--panel); color:var(--text); font-size:14px; font-weight:700;
+    letter-spacing:.06em; cursor:pointer; text-transform:uppercase;
+    transition:background .1s ease;
+  }
+  .take-btn:active{ background:var(--panel-2); }
+  .clap-btn{
+    flex:1.7; min-height:54px; border-radius:6px; border:2px solid var(--yellow-ink);
+    background:var(--yellow); color:var(--yellow-ink); font-size:16px; font-weight:800;
+    letter-spacing:.08em; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;
+    text-transform:uppercase; transition:filter .1s ease;
+  }
+  .clap-btn:active{ filter:brightness(0.92); }
+
+  .exit-hint{ text-align:center; font-size:10.5px; color:var(--muted); padding-top:0; }
+
+  .toast{
+    position:fixed; left:50%; bottom:calc(20px + var(--safe-bottom)); transform:translateX(-50%);
+    background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    padding:12px 20px; border-radius:100px; font-size:14px; font-weight:600;
+    box-shadow:0 8px 24px rgba(0,0,0,.5); opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease;
+    z-index:90;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+
+  .flash{ position:fixed; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:95; transition:opacity .08s ease; }
+  .flash.on{ opacity:.9; }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:60;
+    display:flex; align-items:flex-end; justify-content:center;
+    opacity:0; pointer-events:none; transition:opacity .18s ease;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  .sheet{
+    width:100%; max-width:520px; background:var(--panel); border-radius:20px 20px 0 0;
+    border:1px solid var(--border); border-bottom:none;
+    max-height:88vh; overflow-y:auto;
+    padding: 16px 18px calc(20px + var(--safe-bottom));
+    transform:translateY(20px); transition:transform .18s ease;
+  }
+  .overlay.open .sheet{ transform:translateY(0); }
+  .sheet-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .sheet-header h2{ margin:0; font-size:16px; }
+
+  .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+  .field label{ font-size:12.5px; color:var(--muted); font-weight:700; }
+  .field input, .field select{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:10px;
+    color:var(--text); font-size:16px; padding:12px; min-height:44px;
+  }
+  .field-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .field-grid input{ text-align:center; font-variant-numeric:tabular-nums; }
+
+  .sheet-actions{ display:flex; gap:10px; margin-top:12px; }
+  .sheet-btn{
+    flex:1; min-height:48px; border-radius:12px; border:1px solid var(--border);
+    background:var(--panel-2); color:var(--text); font-size:14px; font-weight:700; cursor:pointer;
+  }
+  .sheet-btn.primary{ background:var(--yellow); color:var(--yellow-ink); border:none; }
+  .sheet-btn.danger{ color:var(--danger); }
+
+  .history-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:12px; max-height:50vh; overflow-y:auto; }
+  .history-item{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:12px;
+    padding:11px 13px; display:flex; align-items:center; justify-content:space-between; gap:10px; cursor:pointer;
+  }
+  .history-item .info strong{ display:block; font-size:14px; }
+  .history-item .info span{ display:block; font-size:11.5px; color:var(--muted); margin-top:2px; font-variant-numeric:tabular-nums; }
+  .history-item .badge{ background:var(--panel); color:var(--yellow); font-weight:800; font-size:12px; padding:4px 9px; border-radius:100px; flex:none; }
+  .history-empty{ text-align:center; color:var(--muted); padding:30px 10px; font-size:13.5px; }
+
+  .qr-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; padding:6px 0 10px; }
+  .qr-wrap canvas{ background:#fff; border-radius:10px; padding:10px; width:230px; height:230px; }
+  .qr-wrap p{ margin:0; font-size:12px; color:var(--muted); text-align:center; }
+
+  .install-banner{
+    position:fixed; left:16px; right:16px; bottom:calc(16px + var(--safe-bottom));
+    background:var(--panel-2); border:1px solid var(--border); border-radius:14px;
+    padding:14px 16px; display:flex; align-items:center; gap:12px; z-index:55;
+    box-shadow:0 10px 30px rgba(0,0,0,.4);
+    transform:translateY(150%); transition:transform .25s ease;
+  }
+  .install-banner.show{ transform:translateY(0); }
+  .install-banner p{ margin:0; font-size:13px; flex:1; }
+  .install-banner button{ border:none; border-radius:10px; padding:10px 14px; font-weight:700; font-size:13px; cursor:pointer; }
+  .install-banner .install-yes{ background:var(--yellow); color:var(--yellow-ink); }
+  .install-banner .install-no{ background:transparent; color:var(--muted); }
+
+  .hidden{ display:none !important; }
+
+  @media (max-height: 640px){
+    .exit-hint{ display:none; }
+    .slate-card{ padding:1.4vh 4vw; gap:1vh; }
+    .tc-digits{ font-size:clamp(30px, 10vw, 64px); }
+  }
+
+  @media (max-width: 340px){
+    .field-grid{ gap:6px; }
+    .clap-btn{ font-size:14px; }
+    .take-btn{ font-size:12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="flash" id="flash"></div>
+
+<div class="slate" id="slate">
+  <div class="topbar">
+    <div class="brand"><span class="mark">🎬</span> CLAPPERBOARD DIGITAL</div>
+    <div class="topbar-actions">
+      <button class="icon-btn" id="qr-btn" title="Cod QR">▦</button>
+      <button class="icon-btn" id="history-btn" title="Istoric (h)">📜</button>
+      <button class="icon-btn" id="export-btn" title="Exportă metadate">⤓</button>
+      <button class="icon-btn" id="edit-btn" title="Editează">✏️</button>
+      <button class="icon-btn" id="fullscreen-btn" title="Ecran complet (f)">⛶</button>
+    </div>
+  </div>
+
+  <div class="stripes"></div>
+
+  <div class="slate-card">
+    <div class="tc-block" id="tc-block">
+      <div class="tc-digits" id="tc-digits">00:00:00<span class="frames">:00</span></div>
+      <div class="tc-label">TIMECODE — atinge pentru a seta manual</div>
+    </div>
+
+    <div class="info-rows">
+      <div class="info-row" id="row-project"><span class="ic">📁</span><span class="val" id="disp-project">Atinge pentru a completa proiectul</span></div>
+      <div class="info-row" id="row-scene"><span class="ic">🎬</span><span class="val" id="disp-scene">Scena —</span></div>
+      <div class="info-row" id="row-take"><span class="ic">🎞️</span><span class="val" id="disp-take">Take 1</span></div>
+      <div class="info-row" id="row-camera"><span class="ic">🎥</span><span class="val" id="disp-camera">Cameră —</span></div>
+      <div class="info-row datetime-row" id="row-datetime">
+        <span class="ic">📅</span><span class="val" id="disp-date">—</span>
+        <span class="ic">⏰</span><span class="val" id="disp-clock">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="take-btn" id="take-minus">Take −</button>
+    <button class="take-btn" id="take-plus">Take +</button>
+    <button class="clap-btn" id="clap-btn">Clap</button>
+  </div>
+
+  <div class="exit-hint">Apasă ESC sau atinge ecranul pentru a ieși din ecran complet</div>
+</div>
+
+<div class="overlay" id="edit-overlay">
+  <div class="sheet">
+    <div class="sheet-header"><h2>✏️ Editează informațiile</h2><button class="icon-btn" id="close-edit-btn">✕</button></div>
+    <div class="field"><label>📁 Proiect</label><input id="f-project" type="text" placeholder="Nunta Ana &amp; Mihai"></div>
+    <div class="field"><label>🎬 Scenă</label><input id="f-scene" type="text" placeholder="12A"></div>
+    <div class="field"><label>🎤 Regizor</label><input id="f-director" type="text" placeholder="Cristi Gordas"></div>
+    <div class="field"><label>🎥 Cameră</label><input id="f-camera" type="text" placeholder="Sony FX6"></div>
+    <div class="field"><label>📝 Notițe</label><input id="f-notes" type="text" placeholder="Stabilizator activat"></div>
+    <div class="sheet-actions">
+      <button class="sheet-btn danger" id="reset-fields-btn">🔄 Resetează</button>
+      <button class="sheet-btn primary" id="save-fields-btn">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="tc-overlay">
+  <div class="sheet">
+    <div class="sheet-header"><h2>⏱ Setează timecode</h2><button class="icon-btn" id="close-tc-btn">✕</button></div>
+    <div class="field-grid">
+      <div class="field"><label>HH</label><input id="tc-hh" type="number" min="0" max="23" inputmode="numeric"></div>
+      <div class="field"><label>MM</label><input id="tc-mm" type="number" min="0" max="59" inputmode="numeric"></div>
+      <div class="field"><label>SS</label><input id="tc-ss" type="number" min="0" max="59" inputmode="numeric"></div>
+      <div class="field"><label>FF</label><input id="tc-ff" type="number" min="0" max="29" inputmode="numeric"></div>
+    </div>
+    <div class="field">
+      <label>Cadre pe secundă (fps)</label>
+      <select id="tc-fps">
+        <option value="24">24</option>
+        <option value="25">25</option>
+        <option value="30">30</option>
+      </select>
+    </div>
+    <div class="sheet-actions">
+      <button class="sheet-btn" id="tc-sync-now-btn">🔄 Sincronizează cu ora sistemului</button>
+      <button class="sheet-btn primary" id="tc-save-btn">Salvează</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="history-overlay">
+  <div class="sheet">
+    <div class="sheet-header"><h2>📜 Istoric take-uri</h2><button class="icon-btn" id="close-history-btn">✕</button></div>
+    <div class="history-list" id="history-list"></div>
+    <div class="sheet-actions">
+      <button class="sheet-btn danger" id="clear-history-btn" style="width:100%;">🗑 Șterge istoricul</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="qr-overlay">
+  <div class="sheet">
+    <div class="sheet-header"><h2>▦ Cod QR</h2><button class="icon-btn" id="close-qr-btn">✕</button></div>
+    <div class="qr-wrap">
+      <canvas id="qr-canvas" width="230" height="230"></canvas>
+      <p>Scanează pentru proiect, scenă, take și timecode</p>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="export-overlay">
+  <div class="sheet">
+    <div class="sheet-header"><h2>⤓ Exportă metadate</h2><button class="icon-btn" id="close-export-btn">✕</button></div>
+    <p style="font-size:13px; color:var(--muted); margin-top:0;">
+      Exportă toate take-urile înregistrate ca fișier pentru montaj sau import parțial în DaVinci Resolve.
+      Coloana <strong>File Name</strong> rămâne goală — completeaz-o manual cu numele fișierelor după ingest,
+      apoi folosește <em>Media Pool → Metadata → Import</em> în Resolve.
+    </p>
+    <div class="sheet-actions">
+      <button class="sheet-btn" id="export-csv-btn">📄 CSV (Resolve)</button>
+      <button class="sheet-btn" id="export-json-btn">🧾 JSON</button>
+    </div>
+  </div>
+</div>
+
+<div class="install-banner" id="install-banner">
+  <p>📲 Adaugă Clapperboard Digital pe ecranul de pornire pentru acces instant, fără bara de browser.</p>
+  <button class="install-yes" id="install-yes-btn">Instalează</button>
+  <button class="install-no" id="install-no-btn">✕</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const STATE_KEY = "clapperboard_state_v2";
+  const HISTORY_KEY = "clapperboard_history";
+  const MAX_HISTORY = 200;
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      return Object.assign({
+        project: "", scene: "", take: 1, director: "", camera: "", notes: "",
+        fps: 25, tcOffsetMs: 0,
+      }, parsed);
+    } catch (e) {
+      return { project: "", scene: "", take: 1, director: "", camera: "", notes: "", fps: 25, tcOffsetMs: 0 };
+    }
+  }
+
+  let state = loadState();
+  function saveState() { localStorage.setItem(STATE_KEY, JSON.stringify(state)); }
+
+  function loadHistory() {
+    try {
+      const raw = localStorage.getItem(HISTORY_KEY);
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) { return []; }
+  }
+  function saveHistory() { localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, MAX_HISTORY))); }
+  let history = loadHistory();
+
+  function currentTimecode() {
+    const now = Date.now() + state.tcOffsetMs;
+    const d = new Date(now);
+    const fps = state.fps || 25;
+    const ff = Math.floor((d.getMilliseconds() / 1000) * fps);
+    return { hh: d.getHours(), mm: d.getMinutes(), ss: d.getSeconds(), ff, fps };
+  }
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+  function formatTimecode(tc) { return `${pad(tc.hh)}:${pad(tc.mm)}:${pad(tc.ss)}:${pad(tc.ff)}`; }
+
+  function renderTimecode() {
+    const tc = currentTimecode();
+    document.getElementById("tc-digits").innerHTML =
+      `${pad(tc.hh)}:${pad(tc.mm)}:${pad(tc.ss)}<span class="frames">:${pad(tc.ff)}</span>`;
+  }
+  setInterval(renderTimecode, 1000 / 25);
+  renderTimecode();
+
+  function renderClock() {
+    const now = new Date();
+    document.getElementById("disp-date").textContent = now.toISOString().slice(0, 10);
+    document.getElementById("disp-clock").textContent = now.toTimeString().slice(0, 8);
+  }
+  renderClock();
+  setInterval(() => { renderClock(); renderQr(); }, 1000);
+
+  function renderFields() {
+    document.getElementById("disp-project").textContent = state.project || "Atinge pentru a completa proiectul";
+    document.getElementById("disp-scene").textContent = state.scene ? `Scena ${state.scene}` : "Scena —";
+    document.getElementById("disp-take").textContent = `Take ${state.take}`;
+    document.getElementById("disp-camera").textContent = state.camera || "Cameră —";
+  }
+  renderFields();
+
+  function currentData() {
+    const tc = currentTimecode();
+    const now = new Date();
+    return {
+      project: state.project, scene: state.scene, take: state.take,
+      director: state.director, camera: state.camera, notes: state.notes,
+      timecode: formatTimecode(tc),
+      date: now.toISOString().slice(0, 10),
+      time: now.toTimeString().slice(0, 8),
+    };
+  }
+
+  let qrDebounce = null;
+  function renderQr() {
+    if (qrDebounce) clearTimeout(qrDebounce);
+    qrDebounce = setTimeout(() => {
+      const canvas = document.getElementById("qr-canvas");
+      if (!window.QRCode || !canvas) return;
+      QRCode.toCanvas(canvas, JSON.stringify(currentData()), { width: 230, margin: 1, color: { dark: "#0a0a0c", light: "#ffffff" } }, () => {});
+    }, 120);
+  }
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.classList.add("show");
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 1800);
+  }
+  function flashScreen() {
+    const flash = document.getElementById("flash");
+    flash.classList.add("on");
+    setTimeout(() => flash.classList.remove("on"), 110);
+  }
+
+  let audioCtx = null;
+  function playClapSound() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!audioCtx) audioCtx = new Ctx();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+
+      const bufferSize = Math.floor(audioCtx.sampleRate * 0.18);
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2.2);
+      }
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = buffer;
+
+      const bandpass = audioCtx.createBiquadFilter();
+      bandpass.type = "bandpass";
+      bandpass.frequency.value = 1800;
+      bandpass.Q.value = 0.6;
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(1.4, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+
+      const thump = audioCtx.createOscillator();
+      thump.type = "sine";
+      thump.frequency.setValueAtTime(160, audioCtx.currentTime);
+      thump.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.09);
+      const thumpGain = audioCtx.createGain();
+      thumpGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+      thumpGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+
+      noise.connect(bandpass).connect(gain).connect(audioCtx.destination);
+      thump.connect(thumpGain).connect(audioCtx.destination);
+
+      noise.start(); noise.stop(audioCtx.currentTime + 0.2);
+      thump.start(); thump.stop(audioCtx.currentTime + 0.12);
+
+      if (navigator.vibrate) navigator.vibrate([0, 40]);
+    } catch (e) { /* Web Audio unavailable — silent no-op */ }
+  }
+
+  document.getElementById("clap-btn").addEventListener("click", () => {
+    if (!state.project) {
+      showToast("Completează proiectul înainte de CLAP (✏️)");
+      openOverlay("edit-overlay");
+      populateEditSheet();
+      return;
+    }
+    const data = currentData();
+    history.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      project: data.project, scene: data.scene, take: data.take,
+      director: data.director, camera: data.camera, notes: data.notes,
+      timecode: data.timecode, date: data.date, time: data.time,
+    });
+    saveHistory();
+
+    playClapSound();
+    flashScreen();
+    showToast(`Take ${data.take} înregistrat — ${data.timecode}`);
+
+    state.take += 1;
+    saveState();
+    renderFields();
+    renderQr();
+  });
+
+  document.getElementById("take-plus").addEventListener("click", () => {
+    state.take += 1; saveState(); renderFields(); renderQr();
+  });
+  document.getElementById("take-minus").addEventListener("click", () => {
+    state.take = Math.max(1, state.take - 1); saveState(); renderFields(); renderQr();
+  });
+
+  function openOverlay(id) { document.getElementById(id).classList.add("open"); }
+  function closeOverlay(id) { document.getElementById(id).classList.remove("open"); }
+  function closeAllOverlays() {
+    document.querySelectorAll(".overlay.open").forEach(el => el.classList.remove("open"));
+  }
+
+  function populateEditSheet() {
+    document.getElementById("f-project").value = state.project;
+    document.getElementById("f-scene").value = state.scene;
+    document.getElementById("f-director").value = state.director;
+    document.getElementById("f-camera").value = state.camera;
+    document.getElementById("f-notes").value = state.notes;
+  }
+
+  document.getElementById("edit-btn").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
+  document.getElementById("row-project").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
+  document.getElementById("row-scene").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
+  document.getElementById("row-camera").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
+  document.getElementById("close-edit-btn").addEventListener("click", () => closeOverlay("edit-overlay"));
+
+  document.getElementById("save-fields-btn").addEventListener("click", () => {
+    state.project = document.getElementById("f-project").value.trim();
+    state.scene = document.getElementById("f-scene").value.trim();
+    state.director = document.getElementById("f-director").value.trim();
+    state.camera = document.getElementById("f-camera").value.trim();
+    state.notes = document.getElementById("f-notes").value.trim();
+    saveState();
+    renderFields();
+    renderQr();
+    closeOverlay("edit-overlay");
+    showToast("Salvat");
+  });
+
+  document.getElementById("reset-fields-btn").addEventListener("click", () => {
+    if (!confirm("Resetezi toate câmpurile?")) return;
+    state.project = ""; state.scene = ""; state.director = ""; state.camera = ""; state.notes = ""; state.take = 1;
+    saveState();
+    renderFields();
+    renderQr();
+    populateEditSheet();
+    showToast("Câmpuri resetate");
+  });
+
+  document.getElementById("tc-block").addEventListener("click", () => {
+    const tc = currentTimecode();
+    document.getElementById("tc-hh").value = tc.hh;
+    document.getElementById("tc-mm").value = tc.mm;
+    document.getElementById("tc-ss").value = tc.ss;
+    document.getElementById("tc-ff").value = tc.ff;
+    document.getElementById("tc-fps").value = String(state.fps || 25);
+    openOverlay("tc-overlay");
+  });
+  document.getElementById("close-tc-btn").addEventListener("click", () => closeOverlay("tc-overlay"));
+
+  document.getElementById("tc-save-btn").addEventListener("click", () => {
+    const hh = Math.min(23, Math.max(0, parseInt(document.getElementById("tc-hh").value, 10) || 0));
+    const mm = Math.min(59, Math.max(0, parseInt(document.getElementById("tc-mm").value, 10) || 0));
+    const ss = Math.min(59, Math.max(0, parseInt(document.getElementById("tc-ss").value, 10) || 0));
+    const fps = parseInt(document.getElementById("tc-fps").value, 10) || 25;
+    const ff = Math.min(fps - 1, Math.max(0, parseInt(document.getElementById("tc-ff").value, 10) || 0));
+
+    state.fps = fps;
+
+    const now = new Date();
+    const target = new Date(now);
+    target.setHours(hh, mm, ss, Math.round((ff / fps) * 1000));
+
+    state.tcOffsetMs = target.getTime() - now.getTime();
+    saveState();
+    renderTimecode();
+    closeOverlay("tc-overlay");
+    showToast("Timecode setat");
+  });
+
+  document.getElementById("tc-sync-now-btn").addEventListener("click", () => {
+    state.tcOffsetMs = 0;
+    saveState();
+    renderTimecode();
+    closeOverlay("tc-overlay");
+    showToast("Sincronizat cu ora sistemului");
+  });
+
+  document.getElementById("history-btn").addEventListener("click", () => { renderHistoryList(); openOverlay("history-overlay"); });
+  document.getElementById("close-history-btn").addEventListener("click", () => closeOverlay("history-overlay"));
+
+  document.getElementById("clear-history-btn").addEventListener("click", () => {
+    if (!confirm("Ștergi tot istoricul de take-uri? Acțiunea nu poate fi anulată.")) return;
+    history = [];
+    saveHistory();
+    renderHistoryList();
+    showToast("Istoric șters");
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement("div");
+    div.textContent = str || "";
+    return div.innerHTML;
+  }
+
+  function renderHistoryList() {
+    const list = document.getElementById("history-list");
+    if (!history.length) {
+      list.innerHTML = '<div class="history-empty">Niciun take înregistrat încă.<br>Apasă CLAP pentru a începe.</div>';
+      return;
+    }
+    list.innerHTML = history.map(h => `
+      <div class="history-item" data-id="${h.id}">
+        <div class="info">
+          <strong>${escapeHtml(h.project)}${h.scene ? " · " + escapeHtml(h.scene) : ""}</strong>
+          <span>${escapeHtml(h.timecode || "")} · ${escapeHtml(h.date)} ${escapeHtml(h.time || "")}</span>
+        </div>
+        <div class="badge">Take ${h.take}</div>
+      </div>
+    `).join("");
+
+    list.querySelectorAll(".history-item").forEach(item => {
+      item.addEventListener("click", () => {
+        const entry = history.find(h => h.id === item.dataset.id);
+        if (!entry) return;
+        state.project = entry.project; state.scene = entry.scene;
+        state.director = entry.director; state.camera = entry.camera; state.notes = entry.notes;
+        state.take = entry.take + 1;
+        saveState();
+        renderFields();
+        renderQr();
+        closeOverlay("history-overlay");
+        showToast("Detalii încărcate din istoric");
+      });
+    });
+  }
+
+  document.getElementById("qr-btn").addEventListener("click", () => { renderQr(); openOverlay("qr-overlay"); });
+  document.getElementById("close-qr-btn").addEventListener("click", () => closeOverlay("qr-overlay"));
+
+  document.getElementById("export-btn").addEventListener("click", () => openOverlay("export-overlay"));
+  document.getElementById("close-export-btn").addEventListener("click", () => closeOverlay("export-overlay"));
+
+  function downloadBlob(content, filename, mime) {
+    const blob = new Blob([content], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function csvEscape(value) {
+    const str = String(value == null ? "" : value);
+    if (/[",\n]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+    return str;
+  }
+
+  document.getElementById("export-csv-btn").addEventListener("click", () => {
+    if (!history.length) { showToast("Niciun take de exportat"); return; }
+    const headers = ["File Name", "Project", "Scene", "Take", "Timecode", "Date", "Time", "Director", "Camera", "Notes"];
+    const rows = history.slice().reverse().map(h => [
+      "", h.project, h.scene, h.take, h.timecode || "", h.date, h.time || "", h.director || "", h.camera || "", h.notes || "",
+    ]);
+    const csv = [headers, ...rows].map(row => row.map(csvEscape).join(",")).join("\r\n");
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadBlob(csv, `clapperboard-metadata-${stamp}.csv`, "text/csv;charset=utf-8");
+    showToast("CSV exportat");
+    closeOverlay("export-overlay");
+  });
+
+  document.getElementById("export-json-btn").addEventListener("click", () => {
+    if (!history.length) { showToast("Niciun take de exportat"); return; }
+    const data = history.slice().reverse();
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadBlob(JSON.stringify(data, null, 2), `clapperboard-metadata-${stamp}.json`, "application/json");
+    showToast("JSON exportat");
+    closeOverlay("export-overlay");
+  });
+
+  function isFullscreen() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+
+  function requestFs() {
+    const el = document.documentElement;
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req && !isFullscreen()) {
+      try { const p = req.call(el); if (p && p.catch) p.catch(() => {}); } catch (e) {}
+    }
+  }
+  function exitFs() {
+    if (isFullscreen()) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) { try { exit.call(document); } catch (e) {} }
+    }
+  }
+
+  document.getElementById("fullscreen-btn").addEventListener("click", () => {
+    if (isFullscreen()) exitFs(); else requestFs();
+  });
+
+  function firstTapFullscreen(e) {
+    if (e.target.closest(".overlay")) return;
+    requestFs();
+    document.removeEventListener("click", firstTapFullscreen);
+  }
+  document.addEventListener("click", firstTapFullscreen);
+
+  document.getElementById("slate").addEventListener("click", (e) => {
+    if (e.target.id === "slate" || e.target.classList.contains("stripes")) {
+      exitFs();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    const tag = document.activeElement && document.activeElement.tagName;
+    const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+
+    if (e.key === "Escape") {
+      if (document.querySelector(".overlay.open")) { closeAllOverlays(); return; }
+      exitFs();
+      return;
+    }
+    if (typing) return;
+
+    if (e.key === "+" || e.key === "=") document.getElementById("take-plus").click();
+    else if (e.key === "-" || e.key === "_") document.getElementById("take-minus").click();
+    else if (e.key === " ") { e.preventDefault(); document.getElementById("clap-btn").click(); }
+    else if (e.key === "f" || e.key === "F") { if (isFullscreen()) exitFs(); else requestFs(); }
+    else if (e.key === "h" || e.key === "H") { renderHistoryList(); openOverlay("history-overlay"); }
+  });
+
+  let deferredPrompt = null;
+  const installBanner = document.getElementById("install-banner");
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (!localStorage.getItem("clapperboard_install_dismissed")) installBanner.classList.add("show");
+  });
+  document.getElementById("install-yes-btn").addEventListener("click", async () => {
+    installBanner.classList.remove("show");
+    if (deferredPrompt) { deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
+  });
+  document.getElementById("install-no-btn").addEventListener("click", () => {
+    installBanner.classList.remove("show");
+    localStorage.setItem("clapperboard_install_dismissed", "1");
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    });
+    let refreshedOnce = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (refreshedOnce) return;
+      refreshedOnce = true;
+      window.location.reload();
+    });
+  }
+})();
+</script>
+</body>
+</html>

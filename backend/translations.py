@@ -24,10 +24,10 @@ TRANSLATIONS = {
         "field_camera": "Cameră",
         "field_notes": "Notițe",
 
-        "btn_generate": "🎬 Generează ecran",
-        "btn_export_video": "🎞️ Exportă video",
-        "btn_export_pdf": "📄 Exportă PDF",
-        "btn_reset": "↺ Resetează",
+        "btn_generate": "Generează ecran",
+        "btn_export_video": "Exportă video",
+        "btn_export_pdf": "Exportă PDF",
+        "btn_reset": "Resetează",
         "btn_new_take": "Take nou (+1)",
 
         "status_ready": "Gata",
@@ -72,7 +72,7 @@ TRANSLATIONS = {
 
         "templates_label": "📋 Șabloane rapide",
         "qr_checkbox_label": "Include cod QR pe ecran",
-        "btn_fullscreen": "⛶ Ecran complet",
+        "btn_fullscreen": "Ecran complet",
 
         "new_template_name": "Nume șablon:",
         "add_template_btn": "➕ Adaugă șablon",
@@ -128,10 +128,10 @@ TRANSLATIONS = {
         "field_camera": "Camera",
         "field_notes": "Notes",
 
-        "btn_generate": "🎬 Generate screen",
-        "btn_export_video": "🎞️ Export video",
-        "btn_export_pdf": "📄 Export PDF",
-        "btn_reset": "↺ Reset",
+        "btn_generate": "Generate screen",
+        "btn_export_video": "Export video",
+        "btn_export_pdf": "Export PDF",
+        "btn_reset": "Reset",
         "btn_new_take": "New take (+1)",
 
         "status_ready": "Ready",
@@ -176,7 +176,7 @@ TRANSLATIONS = {
 
         "templates_label": "📋 Quick templates",
         "qr_checkbox_label": "Include QR code on screen",
-        "btn_fullscreen": "⛶ Fullscreen",
+        "btn_fullscreen": "Fullscreen",
 
         "new_template_name": "Template name:",
         "add_template_btn": "➕ Add template",
@@ -232,10 +232,10 @@ TRANSLATIONS = {
         "field_camera": "Cámara",
         "field_notes": "Notas",
 
-        "btn_generate": "🎬 Generar pantalla",
-        "btn_export_video": "🎞️ Exportar vídeo",
-        "btn_export_pdf": "📄 Exportar PDF",
-        "btn_reset": "↺ Restablecer",
+        "btn_generate": "Generar pantalla",
+        "btn_export_video": "Exportar vídeo",
+        "btn_export_pdf": "Exportar PDF",
+        "btn_reset": "Restablecer",
         "btn_new_take": "Toma nueva (+1)",
 
         "status_ready": "Listo",
@@ -280,7 +280,7 @@ TRANSLATIONS = {
 
         "templates_label": "📋 Plantillas rápidas",
         "qr_checkbox_label": "Incluir código QR en la pantalla",
-        "btn_fullscreen": "⛶ Pantalla completa",
+        "btn_fullscreen": "Pantalla completa",
 
         "new_template_name": "Nombre de la plantilla:",
         "add_template_btn": "➕ Añadir plantilla",
