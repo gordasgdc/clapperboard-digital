@@ -69,6 +69,8 @@
   }
   .lang-btn.active{ background:var(--yellow); color:var(--yellow-ink); border-color:var(--yellow); }
 
+  .info-icon-btn{ font-size:19px; font-weight:800; }
+
   .stripes{
     height:22px; border-radius:4px; overflow:hidden; background:#0a0a0c;
   }
@@ -195,6 +197,19 @@
   .qr-wrap canvas{ background:#fff; border-radius:10px; padding:10px; width:230px; height:230px; }
   .qr-wrap p{ margin:0; font-size:12px; color:var(--muted); text-align:center; }
 
+  .guide-sheet{ max-width:560px; }
+  .guide-intro{ font-size:13px; color:var(--muted); margin:0 0 16px; line-height:1.5; }
+  .guide-content{ display:flex; flex-direction:column; gap:16px; }
+  .guide-step{ display:flex; gap:12px; }
+  .guide-num{
+    flex:none; width:26px; height:26px; border-radius:50%; background:var(--yellow); color:var(--yellow-ink);
+    font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; margin-top:1px;
+  }
+  .guide-step h3{ margin:0 0 4px; font-size:14.5px; }
+  .guide-step p{ margin:0; font-size:13px; color:var(--muted); line-height:1.55; }
+  .guide-divider{ border:none; border-top:1px solid var(--border); margin:18px 0; }
+  .guide-footer{ font-size:12px; color:var(--muted); text-align:center; margin-top:16px; }
+
   .install-banner{
     position:fixed; left:16px; right:16px; bottom:calc(16px + var(--safe-bottom));
     background:var(--panel-2); border:1px solid var(--border); border-radius:14px;
@@ -242,6 +257,7 @@
       <button class="icon-btn" id="export-btn" data-i18n-title="title_export" title="Exportă metadate">⤓</button>
       <button class="icon-btn" id="edit-btn" data-i18n-title="title_edit" title="Editează">✏️</button>
       <button class="icon-btn" id="fullscreen-btn" data-i18n-title="title_fullscreen" title="Ecran complet (f)">⛶</button>
+      <button class="icon-btn info-icon-btn" id="guide-btn" data-i18n-title="title_guide" title="Ghid de utilizare">ⓘ</button>
     </div>
   </div>
 
@@ -356,6 +372,67 @@
   </div>
 </div>
 
+<div class="overlay" id="guide-overlay">
+  <div class="sheet guide-sheet">
+    <div class="sheet-header"><h2 data-i18n="guide_title">ⓘ Ghid de utilizare</h2><button class="icon-btn" id="close-guide-btn">✕</button></div>
+    <p class="guide-intro" data-i18n="guide_intro">Clapperboard Digital înlocuiește clapeta clasică — completezi informațiile filmării, filmezi ecranul la începutul clipului, apoi editorul se orientează după el în montaj.</p>
+    <div class="guide-content">
+      <div class="guide-step">
+        <div class="guide-num">1</div>
+        <div><h3 data-i18n="guide_s1_title">Completează informațiile</h3>
+        <p data-i18n="guide_s1_desc">Atinge Proiect, Scenă, Cameră, Regizor sau Notițe (sau butonul ✏️) ca să deschizi formularul de editare. Take se schimbă separat, din TAKE − / TAKE +.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">2</div>
+        <div><h3 data-i18n="guide_s2_title">Timecode</h3>
+        <p data-i18n="guide_s2_desc">Cifrele roșii de sus urmăresc ora sistemului. Atinge-le ca să setezi manual o valoare (HH/MM/SS/FF + fps) sau ca să resincronizezi cu ora sistemului.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">3</div>
+        <div><h3 data-i18n="guide_s3_title">Butonul CLAP</h3>
+        <p data-i18n="guide_s3_desc">Înregistrează take-ul curent în istoric, redă un sunet scurt și ascuțit — gândit special ca vârf clar în forma de undă, pentru sincronizare precisă în montaj — și avansează automat la take-ul următor.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">4</div>
+        <div><h3 data-i18n="guide_s4_title">Ecran complet</h3>
+        <p data-i18n="guide_s4_desc">Butonul ⛶ (sau tasta F) elimină bara de sus și butoanele — util exact în momentul filmării ecranului. Atinge ecranul sau apasă ESC ca să ieși.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">5</div>
+        <div><h3 data-i18n="guide_s5_title">Cod QR</h3>
+        <p data-i18n="guide_s5_desc">Butonul ▦ arată un cod QR cu proiect, scenă, take și timecode — util dacă vrei să transferi datele rapid către alt dispozitiv sau aplicație, fără să retastezi.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">6</div>
+        <div><h3 data-i18n="guide_s6_title">Istoric</h3>
+        <p data-i18n="guide_s6_desc">Butonul 📜 arată toate take-urile înregistrate cu CLAP. Atingi un rând ca să reîncarci acele informații (util dacă revii la o scenă anterioară).</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">7</div>
+        <div><h3 data-i18n="guide_s7_title">Export</h3>
+        <p data-i18n="guide_s7_desc">Butonul ⤓ exportă tot istoricul ca CSV (gata pentru Media Pool → Metadata → Import în DaVinci Resolve) sau JSON.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">8</div>
+        <div><h3 data-i18n="guide_s8_title">Limbă</h3>
+        <p data-i18n="guide_s8_desc">RO / EN / ES, sus în stânga iconițelor. Alegerea rămâne salvată pe acest dispozitiv.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">9</div>
+        <div><h3 data-i18n="guide_s9_title">Instalare pe tabletă</h3>
+        <p data-i18n="guide_s9_desc">Adaugă pagina pe ecranul de pornire (bannerul de jos, sau meniul browserului → „Adaugă pe ecranul de pornire") — pornește ca o aplicație reală, fără bara browserului.</p></div>
+      </div>
+      <div class="guide-step">
+        <div class="guide-num">10</div>
+        <div><h3 data-i18n="guide_s10_title">Datele tale rămân pe acest dispozitiv</h3>
+        <p data-i18n="guide_s10_desc">Nu există server, nici cont. Istoricul și informațiile completate se salvează doar local, în acest browser — fiecare tabletă are datele ei, complet separate.</p></div>
+      </div>
+    </div>
+    <hr class="guide-divider">
+    <p class="guide-footer" data-i18n="guide_footer">Clapperboard Digital · gratuit și open-source (MIT)</p>
+  </div>
+</div>
+
 <div class="install-banner" id="install-banner">
   <p data-i18n="install_text">📲 Adaugă Clapperboard Digital pe ecranul de pornire pentru acces instant, fără bara de browser.</p>
   <button class="install-yes" id="install-yes-btn" data-i18n="install_yes">Instalează</button>
@@ -372,7 +449,7 @@
   const TRANSLATIONS = {
     ro: {
       title_qr: "Cod QR", title_history: "Istoric (h)", title_export: "Exportă metadate",
-      title_edit: "Editează", title_fullscreen: "Ecran complet (f)",
+      title_edit: "Editează", title_fullscreen: "Ecran complet (f)", title_guide: "Ghid de utilizare",
       tc_label: "TIMECODE — atinge pentru a seta manual",
       label_camera: "Cameră", label_scene: "Scenă", label_take: "Take", label_project: "Proiect",
       label_director: "Regizor", label_notes: "Notițe", label_date: "Dată", label_time: "Ora",
@@ -407,10 +484,33 @@
       toast_history_loaded: "Detalii încărcate din istoric",
       toast_nothing_to_export: "Niciun take de exportat",
       toast_csv_exported: "CSV exportat", toast_json_exported: "JSON exportat",
+      guide_title: "ⓘ Ghid de utilizare",
+      guide_intro: "Clapperboard Digital înlocuiește clapeta clasică — completezi informațiile filmării, filmezi ecranul la începutul clipului, apoi editorul se orientează după el în montaj.",
+      guide_s1_title: "Completează informațiile",
+      guide_s1_desc: "Atinge Proiect, Scenă, Cameră, Regizor sau Notițe (sau butonul ✏️) ca să deschizi formularul de editare. Take se schimbă separat, din TAKE − / TAKE +.",
+      guide_s2_title: "Timecode",
+      guide_s2_desc: "Cifrele roșii de sus urmăresc ora sistemului. Atinge-le ca să setezi manual o valoare (HH/MM/SS/FF + fps) sau ca să resincronizezi cu ora sistemului.",
+      guide_s3_title: "Butonul CLAP",
+      guide_s3_desc: "Înregistrează take-ul curent în istoric, redă un sunet scurt și ascuțit — gândit special ca vârf clar în forma de undă, pentru sincronizare precisă în montaj — și avansează automat la take-ul următor.",
+      guide_s4_title: "Ecran complet",
+      guide_s4_desc: "Butonul ⛶ (sau tasta F) elimină bara de sus și butoanele — util exact în momentul filmării ecranului. Atinge ecranul sau apasă ESC ca să ieși.",
+      guide_s5_title: "Cod QR",
+      guide_s5_desc: "Butonul ▦ arată un cod QR cu proiect, scenă, take și timecode — util dacă vrei să transferi datele rapid către alt dispozitiv sau aplicație, fără să retastezi.",
+      guide_s6_title: "Istoric",
+      guide_s6_desc: "Butonul 📜 arată toate take-urile înregistrate cu CLAP. Atingi un rând ca să reîncarci acele informații (util dacă revii la o scenă anterioară).",
+      guide_s7_title: "Export",
+      guide_s7_desc: "Butonul ⤓ exportă tot istoricul ca CSV (gata pentru Media Pool → Metadata → Import în DaVinci Resolve) sau JSON.",
+      guide_s8_title: "Limbă",
+      guide_s8_desc: "RO / EN / ES, sus în stânga iconițelor. Alegerea rămâne salvată pe acest dispozitiv.",
+      guide_s9_title: "Instalare pe tabletă",
+      guide_s9_desc: "Adaugă pagina pe ecranul de pornire (bannerul de jos, sau meniul browserului → „Adaugă pe ecranul de pornire\") — pornește ca o aplicație reală, fără bara browserului.",
+      guide_s10_title: "Datele tale rămân pe acest dispozitiv",
+      guide_s10_desc: "Nu există server, nici cont. Istoricul și informațiile completate se salvează doar local, în acest browser — fiecare tabletă are datele ei, complet separate.",
+      guide_footer: "Clapperboard Digital · gratuit și open-source (MIT)",
     },
     en: {
       title_qr: "QR code", title_history: "History (h)", title_export: "Export metadata",
-      title_edit: "Edit", title_fullscreen: "Fullscreen (f)",
+      title_edit: "Edit", title_fullscreen: "Fullscreen (f)", title_guide: "User guide",
       tc_label: "TIMECODE — tap to set manually",
       label_camera: "Camera", label_scene: "Scene", label_take: "Take", label_project: "Project",
       label_director: "Director", label_notes: "Notes", label_date: "Date", label_time: "Time",
@@ -445,10 +545,33 @@
       toast_history_loaded: "Details loaded from history",
       toast_nothing_to_export: "No takes to export",
       toast_csv_exported: "CSV exported", toast_json_exported: "JSON exported",
+      guide_title: "ⓘ User guide",
+      guide_intro: "Clapperboard Digital replaces the classic clapperboard — fill in the shoot's info, film the screen at the start of the clip, and the editor will sync to it in post.",
+      guide_s1_title: "Fill in the information",
+      guide_s1_desc: "Tap Project, Scene, Camera, Director or Notes (or the ✏️ button) to open the edit form. Take changes separately, from TAKE − / TAKE +.",
+      guide_s2_title: "Timecode",
+      guide_s2_desc: "The red digits at the top follow the system clock. Tap them to set a value manually (HH/MM/SS/FF + fps) or to resync with the system clock.",
+      guide_s3_title: "The CLAP button",
+      guide_s3_desc: "Records the current take in history, plays a short, sharp sound — designed specifically as a clear spike in the waveform, for precise sync in post — and automatically advances to the next take.",
+      guide_s4_title: "Fullscreen",
+      guide_s4_desc: "The ⛶ button (or the F key) removes the top bar and buttons — useful right when filming the screen. Tap the screen or press ESC to exit.",
+      guide_s5_title: "QR code",
+      guide_s5_desc: "The ▦ button shows a QR code with project, scene, take and timecode — handy if you want to transfer the data quickly to another device or app, without retyping.",
+      guide_s6_title: "History",
+      guide_s6_desc: "The 📜 button shows all takes recorded with CLAP. Tap a row to reload that information (useful if you go back to an earlier scene).",
+      guide_s7_title: "Export",
+      guide_s7_desc: "The ⤓ button exports the entire history as CSV (ready for Media Pool → Metadata → Import in DaVinci Resolve) or JSON.",
+      guide_s8_title: "Language",
+      guide_s8_desc: "RO / EN / ES, top-left of the icons. The choice stays saved on this device.",
+      guide_s9_title: "Installing on a tablet",
+      guide_s9_desc: "Add the page to the home screen (the banner at the bottom, or the browser menu → \"Add to Home Screen\") — it starts like a real app, with no browser bar.",
+      guide_s10_title: "Your data stays on this device",
+      guide_s10_desc: "There's no server, no account. History and the information you fill in are saved only locally, in this browser — each tablet has its own data, fully separate.",
+      guide_footer: "Clapperboard Digital · free and open-source (MIT)",
     },
     es: {
       title_qr: "Código QR", title_history: "Historial (h)", title_export: "Exportar metadatos",
-      title_edit: "Editar", title_fullscreen: "Pantalla completa (f)",
+      title_edit: "Editar", title_fullscreen: "Pantalla completa (f)", title_guide: "Guía de uso",
       tc_label: "TIMECODE — toca para ajustar manualmente",
       label_camera: "Cámara", label_scene: "Escena", label_take: "Toma", label_project: "Proyecto",
       label_director: "Director", label_notes: "Notas", label_date: "Fecha", label_time: "Hora",
@@ -483,6 +606,29 @@
       toast_history_loaded: "Detalles cargados del historial",
       toast_nothing_to_export: "No hay tomas para exportar",
       toast_csv_exported: "CSV exportado", toast_json_exported: "JSON exportado",
+      guide_title: "ⓘ Guía de uso",
+      guide_intro: "Clapperboard Digital reemplaza la claqueta clásica — completas la información del rodaje, filmas la pantalla al inicio del clip y el editor se sincroniza con ella en montaje.",
+      guide_s1_title: "Completa la información",
+      guide_s1_desc: "Toca Proyecto, Escena, Cámara, Director o Notas (o el botón ✏️) para abrir el formulario de edición. La toma cambia por separado, con TOMA − / TOMA +.",
+      guide_s2_title: "Timecode",
+      guide_s2_desc: "Los dígitos rojos de arriba siguen la hora del sistema. Tócalos para ajustar un valor manualmente (HH/MM/SS/FF + fps) o para resincronizar con la hora del sistema.",
+      guide_s3_title: "El botón CLAP",
+      guide_s3_desc: "Registra la toma actual en el historial, reproduce un sonido corto y nítido — pensado especialmente como un pico claro en la forma de onda, para una sincronización precisa en montaje — y avanza automáticamente a la siguiente toma.",
+      guide_s4_title: "Pantalla completa",
+      guide_s4_desc: "El botón ⛶ (o la tecla F) elimina la barra superior y los botones — útil justo en el momento de filmar la pantalla. Toca la pantalla o pulsa ESC para salir.",
+      guide_s5_title: "Código QR",
+      guide_s5_desc: "El botón ▦ muestra un código QR con proyecto, escena, toma y timecode — útil si quieres transferir los datos rápidamente a otro dispositivo o aplicación, sin volver a escribir.",
+      guide_s6_title: "Historial",
+      guide_s6_desc: "El botón 📜 muestra todas las tomas registradas con CLAP. Toca una fila para volver a cargar esa información (útil si vuelves a una escena anterior).",
+      guide_s7_title: "Exportar",
+      guide_s7_desc: "El botón ⤓ exporta todo el historial como CSV (listo para Media Pool → Metadata → Import en DaVinci Resolve) o JSON.",
+      guide_s8_title: "Idioma",
+      guide_s8_desc: "RO / EN / ES, arriba a la izquierda de los iconos. La elección queda guardada en este dispositivo.",
+      guide_s9_title: "Instalación en una tableta",
+      guide_s9_desc: "Añade la página a la pantalla de inicio (el banner de abajo, o el menú del navegador → «Añadir a la pantalla de inicio») — se inicia como una app real, sin la barra del navegador.",
+      guide_s10_title: "Tus datos permanecen en este dispositivo",
+      guide_s10_desc: "No hay servidor ni cuenta. El historial y la información que completas se guardan solo localmente, en este navegador — cada tableta tiene sus propios datos, totalmente separados.",
+      guide_footer: "Clapperboard Digital · gratis y de código abierto (MIT)",
     },
   };
 
@@ -878,6 +1024,9 @@
 
   document.getElementById("qr-btn").addEventListener("click", () => { renderQr(); openOverlay("qr-overlay"); });
   document.getElementById("close-qr-btn").addEventListener("click", () => closeOverlay("qr-overlay"));
+
+  document.getElementById("guide-btn").addEventListener("click", () => openOverlay("guide-overlay"));
+  document.getElementById("close-guide-btn").addEventListener("click", () => closeOverlay("guide-overlay"));
 
   document.getElementById("export-btn").addEventListener("click", () => openOverlay("export-overlay"));
   document.getElementById("close-export-btn").addEventListener("click", () => closeOverlay("export-overlay"));

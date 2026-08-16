@@ -6,6 +6,7 @@ All notable changes to Clapperboard Digital are documented here.
 
 ### Added
 - **PWA language switcher** (RO/EN/ES, small pill buttons top-right, Romanian by default): the desktop app already had full RO/EN/ES translations (`backend/translations.py`) — the PWA was Romanian-only until now. Covers every label, button, dialog, toast and confirm on the slate; choice is remembered per device (localStorage)
+- **PWA user guide**: an ⓘ button in the topbar opens a detailed, document-style usage guide (10 numbered steps covering the info fields, timecode, the CLAP button and its sync-friendly sound, fullscreen, QR code, history, export, language switcher, tablet install, and the local-only data model) — fully translated RO/EN/ES
 
 ### Changed
 - **PWA slate redesigned to resemble a professional timecode slate** (Deity TC-SL1 reference): red LED-style timecode display (was white/yellow) with subtle dot-matrix texture and glow, a colorful chevron stripe (green/yellow/blue/red fading to grayscale, generated as SVG) replacing the diagonal yellow tape pattern, and the info fields reorganized into a white/black instrument-panel grid (Cameră/Scenă/Take, Proiect, Regizor/Notițe, Dată/Ora) instead of a plain icon+text list — removed all emoji from the slate face itself
