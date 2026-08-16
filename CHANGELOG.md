@@ -14,6 +14,9 @@ All notable changes to Clapperboard Digital are documented here.
 - Refined button design: removed emoji clutter from primary action buttons (Generează ecran, Exportă video/PDF, Ecran complet, Resetează), switched them to uppercase labels for a more precise, instrument-panel feel — consistent with the redesigned PWA
 - **Clap sound redesigned for audio sync**: shortened from ~180ms to ~50ms with a much steeper decay, so it reads as a single sharp spike in a waveform (easy to find and align to in an editor) instead of a soft, spread-out burst
 
+### Fixed
+- **QR code button showed nothing**: it loaded the QR library from a CDN URL that never actually existed (404), so the code silently never generated. Replaced with a small, self-hosted QR library bundled in `docs/qrcode.min.js` and precached by the service worker — works instantly and also offline on set, with no external dependency
+
 ## [1.1.0] — Unreleased
 
 ### Added
