@@ -24,6 +24,8 @@
     --yellow:#f5c518;
     --yellow-ink:#141200;
     --danger:#e8483c;
+    --led:#ff3b30;
+    --led-glow: rgba(255,59,48,.55);
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -60,43 +62,52 @@
   .icon-btn:active{ background:var(--panel-2); }
 
   .stripes{
-    height:12px; border-radius:4px;
-    background: repeating-linear-gradient(115deg, var(--yellow) 0 14px, #0a0a0c 14px 28px);
+    height:22px; border-radius:4px; overflow:hidden; background:#0a0a0c;
   }
+  .stripes svg{ display:block; width:100%; height:100%; }
 
   .slate-card{
-    flex:0 1 auto; display:flex; flex-direction:column; justify-content:center; gap:1.6vh;
-    background:var(--panel); border:1px solid var(--border); border-top:2px solid var(--yellow);
-    border-radius:10px;
-    padding:2vh 4vw;
+    flex:0 1 auto; display:flex; flex-direction:column; gap:0;
+    background:#000; border:1px solid var(--border);
+    border-radius:10px; overflow:hidden;
   }
 
-  .tc-block{ text-align:center; cursor:pointer; }
+  .tc-block{ text-align:center; cursor:pointer; background:#000; padding:2.2vh 4vw 1.6vh; position:relative; }
+  .tc-block::before{
+    /* textura fina "dot-matrix", ca pe afisajele LED reale */
+    content:""; position:absolute; inset:0;
+    background-image: radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+    background-size: 4px 4px; pointer-events:none;
+  }
   .tc-digits{
     font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-    font-size:clamp(34px, 11vw, 80px); font-weight:700; letter-spacing:.005em;
-    color:var(--text); line-height:1; font-variant-numeric:tabular-nums;
+    font-size:clamp(34px, 11vw, 80px); font-weight:700; letter-spacing:.02em;
+    color:var(--led); line-height:1; font-variant-numeric:tabular-nums;
+    text-shadow: 0 0 14px var(--led-glow), 0 0 2px var(--led-glow);
   }
-  .tc-digits .frames{ color:var(--yellow); }
+  .tc-digits .frames{ color:var(--led); }
   .tc-label{
-    margin-top:6px; font-size:10px; letter-spacing:.2em; color:var(--muted);
+    margin-top:8px; font-size:10px; letter-spacing:.2em; color:#6b3330;
     font-weight:700; text-transform:uppercase;
   }
 
-  .info-rows{ display:flex; flex-direction:column; gap:0; }
-  .info-row{
-    display:flex; align-items:center; gap:12px; cursor:pointer;
-    padding:7px 6px; border-radius:4px; border-bottom:1px solid var(--border);
+  .info-grid{ display:flex; flex-direction:column; background:#f2f0eb; color:#141414; }
+  .info-row{ display:flex; border-top:1px solid #cfccc3; }
+  .info-row:first-child{ border-top:none; }
+  .info-cell{
+    flex:1 1 0; padding:1.3vh 3vw; cursor:pointer; border-left:1px solid #cfccc3;
+    display:flex; flex-direction:column; gap:2px; min-width:0;
   }
-  .info-row:last-child, .info-row.datetime-row{ border-bottom:none; }
-  .info-row:active{ background:var(--panel-2); }
-  .info-row .ic{ font-size:clamp(14px,2.8vw,18px); flex:none; width:1.4em; text-align:center; opacity:.85; }
-  .info-row .val{
-    font-size:clamp(15px,3.8vw,22px); font-weight:600; color:var(--text);
+  .info-cell:first-child{ border-left:none; }
+  .info-cell:active{ background:#e6e3db; }
+  .info-label{
+    font-size:10px; letter-spacing:.14em; font-weight:800; text-transform:uppercase; color:#8a8578;
+  }
+  .info-value{
+    font-size:clamp(14px,3.4vw,19px); font-weight:700; color:#141414;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
-  .datetime-row .val{ font-size:clamp(12px,2.8vw,15px); font-weight:600; color:var(--muted); font-variant-numeric:tabular-nums; }
-  .datetime-row{ gap:8px; flex-wrap:wrap; padding-top:10px; }
+  .info-cell.empty .info-value{ color:#b3ada0; font-weight:600; }
 
   .action-row{ display:flex; gap:8px; align-items:stretch; }
   .take-btn{
@@ -193,8 +204,9 @@
 
   @media (max-height: 640px){
     .exit-hint{ display:none; }
-    .slate-card{ padding:1.4vh 4vw; gap:1vh; }
+    .tc-block{ padding:1.4vh 4vw 1vh; }
     .tc-digits{ font-size:clamp(30px, 10vw, 64px); }
+    .info-cell{ padding:1vh 3vw; }
   }
 
   @media (max-width: 340px){
@@ -220,22 +232,30 @@
     </div>
   </div>
 
-  <div class="stripes"></div>
-
   <div class="slate-card">
     <div class="tc-block" id="tc-block">
       <div class="tc-digits" id="tc-digits">00:00:00<span class="frames">:00</span></div>
       <div class="tc-label">TIMECODE — atinge pentru a seta manual</div>
     </div>
 
-    <div class="info-rows">
-      <div class="info-row" id="row-project"><span class="ic">📁</span><span class="val" id="disp-project">Atinge pentru a completa proiectul</span></div>
-      <div class="info-row" id="row-scene"><span class="ic">🎬</span><span class="val" id="disp-scene">Scena —</span></div>
-      <div class="info-row" id="row-take"><span class="ic">🎞️</span><span class="val" id="disp-take">Take 1</span></div>
-      <div class="info-row" id="row-camera"><span class="ic">🎥</span><span class="val" id="disp-camera">Cameră —</span></div>
-      <div class="info-row datetime-row" id="row-datetime">
-        <span class="ic">📅</span><span class="val" id="disp-date">—</span>
-        <span class="ic">⏰</span><span class="val" id="disp-clock">—</span>
+    <div class="stripes" id="stripes"></div>
+
+    <div class="info-grid">
+      <div class="info-row">
+        <div class="info-cell" id="row-camera"><span class="info-label">Cameră</span><span class="info-value" id="disp-camera">—</span></div>
+        <div class="info-cell" id="row-scene"><span class="info-label">Scenă</span><span class="info-value" id="disp-scene">—</span></div>
+        <div class="info-cell" id="row-take"><span class="info-label">Take</span><span class="info-value" id="disp-take">1</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-cell" id="row-project"><span class="info-label">Proiect</span><span class="info-value" id="disp-project">Atinge pentru a completa</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-cell" id="row-director"><span class="info-label">Regizor</span><span class="info-value" id="disp-director">—</span></div>
+        <div class="info-cell" id="row-notes"><span class="info-label">Notițe</span><span class="info-value" id="disp-notes">—</span></div>
+      </div>
+      <div class="info-row">
+        <div class="info-cell"><span class="info-label">Dată</span><span class="info-value" id="disp-date">—</span></div>
+        <div class="info-cell"><span class="info-label">Ora</span><span class="info-value" id="disp-clock">—</span></div>
       </div>
     </div>
   </div>
@@ -393,12 +413,44 @@
   setInterval(() => { renderClock(); renderQr(); }, 1000);
 
   function renderFields() {
-    document.getElementById("disp-project").textContent = state.project || "Atinge pentru a completa proiectul";
-    document.getElementById("disp-scene").textContent = state.scene ? `Scena ${state.scene}` : "Scena —";
-    document.getElementById("disp-take").textContent = `Take ${state.take}`;
-    document.getElementById("disp-camera").textContent = state.camera || "Cameră —";
+    document.getElementById("disp-project").textContent = state.project || "Atinge pentru a completa";
+    document.getElementById("disp-scene").textContent = state.scene || "—";
+    document.getElementById("disp-take").textContent = state.take;
+    document.getElementById("disp-camera").textContent = state.camera || "—";
+    document.getElementById("disp-director").textContent = state.director || "—";
+    document.getElementById("disp-notes").textContent = state.notes || "—";
   }
   renderFields();
+
+  // Banda de chevron-uri (colorate -> grayscale), ca pe clapetele
+  // profesionale reale - generata in SVG, nu cu imagini, ca sa ramana
+  // perfect ascutita si sa se intinda pe orice latime de ecran.
+  function buildChevronBar() {
+    const svgNS = "http://www.w3.org/2000/svg";
+    const COLS = ["#3aa757", "#f2c230", "#2f7fd6", "#d94a3d", "#101010"];
+    const GRAY_COUNT = 17;
+    for (let i = 0; i < GRAY_COUNT; i++) {
+      const t = i / (GRAY_COUNT - 1);
+      const v = Math.round(40 + t * 210); // #282828 -> aproape alb
+      COLS.push(`rgb(${v},${v},${v})`);
+    }
+    const unit = 40, tall = 28, n = COLS.length;
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("viewBox", `0 0 ${unit * n} ${tall}`);
+    svg.setAttribute("preserveAspectRatio", "none");
+    COLS.forEach((color, i) => {
+      const x = i * unit;
+      const poly = document.createElementNS(svgNS, "polygon");
+      poly.setAttribute("points",
+        `${x},0 ${x + unit * 0.7},0 ${x + unit},${tall / 2} ${x + unit * 0.7},${tall} ${x},${tall} ${x + unit * 0.3},${tall / 2}`);
+      poly.setAttribute("fill", color);
+      svg.appendChild(poly);
+    });
+    const holder = document.getElementById("stripes");
+    holder.innerHTML = "";
+    holder.appendChild(svg);
+  }
+  buildChevronBar();
 
   function currentData() {
     const tc = currentTimecode();
@@ -438,42 +490,49 @@
 
   let audioCtx = null;
   function playClapSound() {
+    // Transient SCURT si ASCUTIT, gandit special pentru sincronizare audio
+    // in montaj: majoritatea energiei e concentrata in primele cateva
+    // milisecunde, ca sa apara ca o linie/varf curat si usor de gasit cu
+    // ochiul liber in forma de unda (waveform) din editor - nu o "explozie"
+    // intinsa pe 150-200ms, unde punctul exact de sincronizare e ambiguu.
     try {
       const Ctx = window.AudioContext || window.webkitAudioContext;
       if (!audioCtx) audioCtx = new Ctx();
       if (audioCtx.state === "suspended") audioCtx.resume();
 
-      const bufferSize = Math.floor(audioCtx.sampleRate * 0.18);
+      const bufferSize = Math.floor(audioCtx.sampleRate * 0.05); // 50ms, nu 180ms
       const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
       const data = buffer.getChannelData(0);
       for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2.2);
+        // exponent mare (6, fata de 2.2 inainte) = decadere mult mai abrupta,
+        // aproape toata energia in primele ~5ms
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 6);
       }
       const noise = audioCtx.createBufferSource();
       noise.buffer = buffer;
 
       const bandpass = audioCtx.createBiquadFilter();
       bandpass.type = "bandpass";
-      bandpass.frequency.value = 1800;
-      bandpass.Q.value = 0.6;
+      bandpass.frequency.value = 2200;
+      bandpass.Q.value = 0.9;
 
       const gain = audioCtx.createGain();
-      gain.gain.setValueAtTime(1.4, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.18);
+      gain.gain.setValueAtTime(1.7, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.02); // varf -> aproape tacere in 20ms
 
       const thump = audioCtx.createOscillator();
       thump.type = "sine";
-      thump.frequency.setValueAtTime(160, audioCtx.currentTime);
-      thump.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.09);
+      thump.frequency.setValueAtTime(150, audioCtx.currentTime);
+      thump.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.05);
       const thumpGain = audioCtx.createGain();
-      thumpGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
-      thumpGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      thumpGain.gain.setValueAtTime(0.45, audioCtx.currentTime); // "corp" discret, nu concureaza cu varful
+      thumpGain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.06);
 
       noise.connect(bandpass).connect(gain).connect(audioCtx.destination);
       thump.connect(thumpGain).connect(audioCtx.destination);
 
-      noise.start(); noise.stop(audioCtx.currentTime + 0.2);
-      thump.start(); thump.stop(audioCtx.currentTime + 0.12);
+      noise.start(); noise.stop(audioCtx.currentTime + 0.05);
+      thump.start(); thump.stop(audioCtx.currentTime + 0.06);
 
       if (navigator.vibrate) navigator.vibrate([0, 40]);
     } catch (e) { /* Web Audio unavailable — silent no-op */ }
@@ -530,6 +589,8 @@
   document.getElementById("row-project").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
   document.getElementById("row-scene").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
   document.getElementById("row-camera").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
+  document.getElementById("row-director").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
+  document.getElementById("row-notes").addEventListener("click", () => { populateEditSheet(); openOverlay("edit-overlay"); });
   document.getElementById("close-edit-btn").addEventListener("click", () => closeOverlay("edit-overlay"));
 
   document.getElementById("save-fields-btn").addEventListener("click", () => {

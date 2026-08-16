@@ -5,7 +5,10 @@ All notable changes to Clapperboard Digital are documented here.
 ## [1.1.1] — Unreleased
 
 ### Changed
+- **PWA slate redesigned to resemble a professional timecode slate** (Deity TC-SL1 reference): red LED-style timecode display (was white/yellow) with subtle dot-matrix texture and glow, a colorful chevron stripe (green/yellow/blue/red fading to grayscale, generated as SVG) replacing the diagonal yellow tape pattern, and the info fields reorganized into a white/black instrument-panel grid (Cameră/Scenă/Take, Proiect, Regizor/Notițe, Dată/Ora) instead of a plain icon+text list — removed all emoji from the slate face itself
+- Director and notes are now shown live on the slate (previously only captured in the edit form and exports)
 - Refined button design: removed emoji clutter from primary action buttons (Generează ecran, Exportă video/PDF, Ecran complet, Resetează), switched them to uppercase labels for a more precise, instrument-panel feel — consistent with the redesigned PWA
+- **Clap sound redesigned for audio sync**: shortened from ~180ms to ~50ms with a much steeper decay, so it reads as a single sharp spike in a waveform (easy to find and align to in an editor) instead of a soft, spread-out burst
 
 ## [1.1.0] — Unreleased
 
