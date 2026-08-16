@@ -61,6 +61,14 @@
   }
   .icon-btn:active{ background:var(--panel-2); }
 
+  .lang-switch{ display:flex; gap:3px; margin-right:4px; }
+  .lang-btn{
+    min-width:30px; height:38px; padding:0 6px; border-radius:6px; border:1px solid var(--border);
+    background:var(--panel); color:var(--muted); font-size:11px; font-weight:800;
+    letter-spacing:.04em; cursor:pointer; transition:background .1s ease, color .1s ease;
+  }
+  .lang-btn.active{ background:var(--yellow); color:var(--yellow-ink); border-color:var(--yellow); }
+
   .stripes{
     height:22px; border-radius:4px; overflow:hidden; background:#0a0a0c;
   }
@@ -224,69 +232,74 @@
   <div class="topbar">
     <div class="brand"><span class="mark">🎬</span> CLAPPERBOARD DIGITAL</div>
     <div class="topbar-actions">
-      <button class="icon-btn" id="qr-btn" title="Cod QR">▦</button>
-      <button class="icon-btn" id="history-btn" title="Istoric (h)">📜</button>
-      <button class="icon-btn" id="export-btn" title="Exportă metadate">⤓</button>
-      <button class="icon-btn" id="edit-btn" title="Editează">✏️</button>
-      <button class="icon-btn" id="fullscreen-btn" title="Ecran complet (f)">⛶</button>
+      <div class="lang-switch" id="lang-switch" role="group" aria-label="Limbă">
+        <button class="lang-btn" data-lang="ro">RO</button>
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+      </div>
+      <button class="icon-btn" id="qr-btn" data-i18n-title="title_qr" title="Cod QR">▦</button>
+      <button class="icon-btn" id="history-btn" data-i18n-title="title_history" title="Istoric (h)">📜</button>
+      <button class="icon-btn" id="export-btn" data-i18n-title="title_export" title="Exportă metadate">⤓</button>
+      <button class="icon-btn" id="edit-btn" data-i18n-title="title_edit" title="Editează">✏️</button>
+      <button class="icon-btn" id="fullscreen-btn" data-i18n-title="title_fullscreen" title="Ecran complet (f)">⛶</button>
     </div>
   </div>
 
   <div class="slate-card">
     <div class="tc-block" id="tc-block">
       <div class="tc-digits" id="tc-digits">00:00:00<span class="frames">:00</span></div>
-      <div class="tc-label">TIMECODE — atinge pentru a seta manual</div>
+      <div class="tc-label" data-i18n="tc_label">TIMECODE — atinge pentru a seta manual</div>
     </div>
 
     <div class="stripes" id="stripes"></div>
 
     <div class="info-grid">
       <div class="info-row">
-        <div class="info-cell" id="row-camera"><span class="info-label">Cameră</span><span class="info-value" id="disp-camera">—</span></div>
-        <div class="info-cell" id="row-scene"><span class="info-label">Scenă</span><span class="info-value" id="disp-scene">—</span></div>
-        <div class="info-cell" id="row-take"><span class="info-label">Take</span><span class="info-value" id="disp-take">1</span></div>
+        <div class="info-cell" id="row-camera"><span class="info-label" data-i18n="label_camera">Cameră</span><span class="info-value" id="disp-camera">—</span></div>
+        <div class="info-cell" id="row-scene"><span class="info-label" data-i18n="label_scene">Scenă</span><span class="info-value" id="disp-scene">—</span></div>
+        <div class="info-cell" id="row-take"><span class="info-label" data-i18n="label_take">Take</span><span class="info-value" id="disp-take">1</span></div>
       </div>
       <div class="info-row">
-        <div class="info-cell" id="row-project"><span class="info-label">Proiect</span><span class="info-value" id="disp-project">Atinge pentru a completa</span></div>
+        <div class="info-cell" id="row-project"><span class="info-label" data-i18n="label_project">Proiect</span><span class="info-value" id="disp-project">Atinge pentru a completa</span></div>
       </div>
       <div class="info-row">
-        <div class="info-cell" id="row-director"><span class="info-label">Regizor</span><span class="info-value" id="disp-director">—</span></div>
-        <div class="info-cell" id="row-notes"><span class="info-label">Notițe</span><span class="info-value" id="disp-notes">—</span></div>
+        <div class="info-cell" id="row-director"><span class="info-label" data-i18n="label_director">Regizor</span><span class="info-value" id="disp-director">—</span></div>
+        <div class="info-cell" id="row-notes"><span class="info-label" data-i18n="label_notes">Notițe</span><span class="info-value" id="disp-notes">—</span></div>
       </div>
       <div class="info-row">
-        <div class="info-cell"><span class="info-label">Dată</span><span class="info-value" id="disp-date">—</span></div>
-        <div class="info-cell"><span class="info-label">Ora</span><span class="info-value" id="disp-clock">—</span></div>
+        <div class="info-cell"><span class="info-label" data-i18n="label_date">Dată</span><span class="info-value" id="disp-date">—</span></div>
+        <div class="info-cell"><span class="info-label" data-i18n="label_time">Ora</span><span class="info-value" id="disp-clock">—</span></div>
       </div>
     </div>
   </div>
 
   <div class="action-row">
-    <button class="take-btn" id="take-minus">Take −</button>
-    <button class="take-btn" id="take-plus">Take +</button>
-    <button class="clap-btn" id="clap-btn">Clap</button>
+    <button class="take-btn" id="take-minus" data-i18n="btn_take_minus">Take −</button>
+    <button class="take-btn" id="take-plus" data-i18n="btn_take_plus">Take +</button>
+    <button class="clap-btn" id="clap-btn" data-i18n="btn_clap">Clap</button>
   </div>
 
-  <div class="exit-hint">Apasă ESC sau atinge ecranul pentru a ieși din ecran complet</div>
+  <div class="exit-hint" data-i18n="exit_hint">Apasă ESC sau atinge ecranul pentru a ieși din ecran complet</div>
 </div>
 
 <div class="overlay" id="edit-overlay">
   <div class="sheet">
-    <div class="sheet-header"><h2>✏️ Editează informațiile</h2><button class="icon-btn" id="close-edit-btn">✕</button></div>
-    <div class="field"><label>📁 Proiect</label><input id="f-project" type="text" placeholder="Nunta Ana &amp; Mihai"></div>
-    <div class="field"><label>🎬 Scenă</label><input id="f-scene" type="text" placeholder="12A"></div>
-    <div class="field"><label>🎤 Regizor</label><input id="f-director" type="text" placeholder="Cristi Gordas"></div>
-    <div class="field"><label>🎥 Cameră</label><input id="f-camera" type="text" placeholder="Sony FX6"></div>
-    <div class="field"><label>📝 Notițe</label><input id="f-notes" type="text" placeholder="Stabilizator activat"></div>
+    <div class="sheet-header"><h2 data-i18n="edit_title">✏️ Editează informațiile</h2><button class="icon-btn" id="close-edit-btn">✕</button></div>
+    <div class="field"><label data-i18n="edit_label_project">📁 Proiect</label><input id="f-project" type="text" data-i18n-placeholder="ph_project" placeholder="Nunta Ana &amp; Mihai"></div>
+    <div class="field"><label data-i18n="edit_label_scene">🎬 Scenă</label><input id="f-scene" type="text" placeholder="12A"></div>
+    <div class="field"><label data-i18n="edit_label_director">🎤 Regizor</label><input id="f-director" type="text" data-i18n-placeholder="ph_director" placeholder="Cristi Gordas"></div>
+    <div class="field"><label data-i18n="edit_label_camera">🎥 Cameră</label><input id="f-camera" type="text" placeholder="Sony FX6"></div>
+    <div class="field"><label data-i18n="edit_label_notes">📝 Notițe</label><input id="f-notes" type="text" data-i18n-placeholder="ph_notes" placeholder="Stabilizator activat"></div>
     <div class="sheet-actions">
-      <button class="sheet-btn danger" id="reset-fields-btn">🔄 Resetează</button>
-      <button class="sheet-btn primary" id="save-fields-btn">Salvează</button>
+      <button class="sheet-btn danger" id="reset-fields-btn" data-i18n="btn_reset">🔄 Resetează</button>
+      <button class="sheet-btn primary" id="save-fields-btn" data-i18n="btn_save">Salvează</button>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="tc-overlay">
   <div class="sheet">
-    <div class="sheet-header"><h2>⏱ Setează timecode</h2><button class="icon-btn" id="close-tc-btn">✕</button></div>
+    <div class="sheet-header"><h2 data-i18n="tc_sheet_title">⏱ Setează timecode</h2><button class="icon-btn" id="close-tc-btn">✕</button></div>
     <div class="field-grid">
       <div class="field"><label>HH</label><input id="tc-hh" type="number" min="0" max="23" inputmode="numeric"></div>
       <div class="field"><label>MM</label><input id="tc-mm" type="number" min="0" max="59" inputmode="numeric"></div>
@@ -294,7 +307,7 @@
       <div class="field"><label>FF</label><input id="tc-ff" type="number" min="0" max="29" inputmode="numeric"></div>
     </div>
     <div class="field">
-      <label>Cadre pe secundă (fps)</label>
+      <label data-i18n="tc_label_fps">Cadre pe secundă (fps)</label>
       <select id="tc-fps">
         <option value="24">24</option>
         <option value="25">25</option>
@@ -302,50 +315,50 @@
       </select>
     </div>
     <div class="sheet-actions">
-      <button class="sheet-btn" id="tc-sync-now-btn">🔄 Sincronizează cu ora sistemului</button>
-      <button class="sheet-btn primary" id="tc-save-btn">Salvează</button>
+      <button class="sheet-btn" id="tc-sync-now-btn" data-i18n="btn_tc_sync">🔄 Sincronizează cu ora sistemului</button>
+      <button class="sheet-btn primary" id="tc-save-btn" data-i18n="btn_save">Salvează</button>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="history-overlay">
   <div class="sheet">
-    <div class="sheet-header"><h2>📜 Istoric take-uri</h2><button class="icon-btn" id="close-history-btn">✕</button></div>
+    <div class="sheet-header"><h2 data-i18n="history_title">📜 Istoric take-uri</h2><button class="icon-btn" id="close-history-btn">✕</button></div>
     <div class="history-list" id="history-list"></div>
     <div class="sheet-actions">
-      <button class="sheet-btn danger" id="clear-history-btn" style="width:100%;">🗑 Șterge istoricul</button>
+      <button class="sheet-btn danger" id="clear-history-btn" style="width:100%;" data-i18n="btn_clear_history">🗑 Șterge istoricul</button>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="qr-overlay">
   <div class="sheet">
-    <div class="sheet-header"><h2>▦ Cod QR</h2><button class="icon-btn" id="close-qr-btn">✕</button></div>
+    <div class="sheet-header"><h2 data-i18n="qr_title">▦ Cod QR</h2><button class="icon-btn" id="close-qr-btn">✕</button></div>
     <div class="qr-wrap">
       <canvas id="qr-canvas" width="230" height="230"></canvas>
-      <p>Scanează pentru proiect, scenă, take și timecode</p>
+      <p data-i18n="qr_hint">Scanează pentru proiect, scenă, take și timecode</p>
     </div>
   </div>
 </div>
 
 <div class="overlay" id="export-overlay">
   <div class="sheet">
-    <div class="sheet-header"><h2>⤓ Exportă metadate</h2><button class="icon-btn" id="close-export-btn">✕</button></div>
-    <p style="font-size:13px; color:var(--muted); margin-top:0;">
+    <div class="sheet-header"><h2 data-i18n="export_title">⤓ Exportă metadate</h2><button class="icon-btn" id="close-export-btn">✕</button></div>
+    <p style="font-size:13px; color:var(--muted); margin-top:0;" data-i18n="export_desc">
       Exportă toate take-urile înregistrate ca fișier pentru montaj sau import parțial în DaVinci Resolve.
       Coloana <strong>File Name</strong> rămâne goală — completeaz-o manual cu numele fișierelor după ingest,
       apoi folosește <em>Media Pool → Metadata → Import</em> în Resolve.
     </p>
     <div class="sheet-actions">
-      <button class="sheet-btn" id="export-csv-btn">📄 CSV (Resolve)</button>
-      <button class="sheet-btn" id="export-json-btn">🧾 JSON</button>
+      <button class="sheet-btn" id="export-csv-btn" data-i18n="btn_export_csv">📄 CSV (Resolve)</button>
+      <button class="sheet-btn" id="export-json-btn" data-i18n="btn_export_json">🧾 JSON</button>
     </div>
   </div>
 </div>
 
 <div class="install-banner" id="install-banner">
-  <p>📲 Adaugă Clapperboard Digital pe ecranul de pornire pentru acces instant, fără bara de browser.</p>
-  <button class="install-yes" id="install-yes-btn">Instalează</button>
+  <p data-i18n="install_text">📲 Adaugă Clapperboard Digital pe ecranul de pornire pentru acces instant, fără bara de browser.</p>
+  <button class="install-yes" id="install-yes-btn" data-i18n="install_yes">Instalează</button>
   <button class="install-no" id="install-no-btn">✕</button>
 </div>
 
@@ -354,6 +367,165 @@
 <script>
 (function () {
   "use strict";
+
+  const LANG_KEY = "clapperboard_lang";
+  const TRANSLATIONS = {
+    ro: {
+      title_qr: "Cod QR", title_history: "Istoric (h)", title_export: "Exportă metadate",
+      title_edit: "Editează", title_fullscreen: "Ecran complet (f)",
+      tc_label: "TIMECODE — atinge pentru a seta manual",
+      label_camera: "Cameră", label_scene: "Scenă", label_take: "Take", label_project: "Proiect",
+      label_director: "Regizor", label_notes: "Notițe", label_date: "Dată", label_time: "Ora",
+      project_placeholder_display: "Atinge pentru a completa",
+      btn_take_minus: "Take −", btn_take_plus: "Take +", btn_clap: "Clap",
+      exit_hint: "Apasă ESC sau atinge ecranul pentru a ieși din ecran complet",
+      edit_title: "✏️ Editează informațiile",
+      edit_label_project: "📁 Proiect", edit_label_scene: "🎬 Scenă", edit_label_director: "🎤 Regizor",
+      edit_label_camera: "🎥 Cameră", edit_label_notes: "📝 Notițe",
+      ph_project: "Nunta Ana & Mihai", ph_director: "Cristi Gordas", ph_notes: "Stabilizator activat",
+      btn_reset: "🔄 Resetează", btn_save: "Salvează",
+      tc_sheet_title: "⏱ Setează timecode", tc_label_fps: "Cadre pe secundă (fps)",
+      btn_tc_sync: "🔄 Sincronizează cu ora sistemului",
+      history_title: "📜 Istoric take-uri", btn_clear_history: "🗑 Șterge istoricul",
+      history_empty: "Niciun take înregistrat încă.<br>Apasă CLAP pentru a începe.",
+      history_take: "Take {n}",
+      qr_title: "▦ Cod QR", qr_hint: "Scanează pentru proiect, scenă, take și timecode",
+      export_title: "⤓ Exportă metadate",
+      export_desc: "Exportă toate take-urile înregistrate ca fișier pentru montaj sau import parțial în DaVinci Resolve. Coloana <strong>File Name</strong> rămâne goală — completeaz-o manual cu numele fișierelor după ingest, apoi folosește <em>Media Pool → Metadata → Import</em> în Resolve.",
+      btn_export_csv: "📄 CSV (Resolve)", btn_export_json: "🧾 JSON",
+      install_text: "📲 Adaugă Clapperboard Digital pe ecranul de pornire pentru acces instant, fără bara de browser.",
+      install_yes: "Instalează",
+      toast_project_needed: "Completează proiectul înainte de CLAP (✏️)",
+      toast_take_recorded: "Take {take} înregistrat — {timecode}",
+      toast_saved: "Salvat",
+      confirm_reset_fields: "Resetezi toate câmpurile?",
+      toast_fields_reset: "Câmpuri resetate",
+      toast_tc_set: "Timecode setat",
+      toast_tc_synced: "Sincronizat cu ora sistemului",
+      confirm_clear_history: "Ștergi tot istoricul de take-uri? Acțiunea nu poate fi anulată.",
+      toast_history_cleared: "Istoric șters",
+      toast_history_loaded: "Detalii încărcate din istoric",
+      toast_nothing_to_export: "Niciun take de exportat",
+      toast_csv_exported: "CSV exportat", toast_json_exported: "JSON exportat",
+    },
+    en: {
+      title_qr: "QR code", title_history: "History (h)", title_export: "Export metadata",
+      title_edit: "Edit", title_fullscreen: "Fullscreen (f)",
+      tc_label: "TIMECODE — tap to set manually",
+      label_camera: "Camera", label_scene: "Scene", label_take: "Take", label_project: "Project",
+      label_director: "Director", label_notes: "Notes", label_date: "Date", label_time: "Time",
+      project_placeholder_display: "Tap to fill in",
+      btn_take_minus: "Take −", btn_take_plus: "Take +", btn_clap: "Clap",
+      exit_hint: "Press ESC or tap the screen to exit fullscreen",
+      edit_title: "✏️ Edit information",
+      edit_label_project: "📁 Project", edit_label_scene: "🎬 Scene", edit_label_director: "🎤 Director",
+      edit_label_camera: "🎥 Camera", edit_label_notes: "📝 Notes",
+      ph_project: "Ana & Mike's Wedding", ph_director: "Cristi Gordas", ph_notes: "Stabilizer on",
+      btn_reset: "🔄 Reset", btn_save: "Save",
+      tc_sheet_title: "⏱ Set timecode", tc_label_fps: "Frames per second (fps)",
+      btn_tc_sync: "🔄 Sync to system clock",
+      history_title: "📜 Take history", btn_clear_history: "🗑 Clear history",
+      history_empty: "No takes recorded yet.<br>Tap CLAP to start.",
+      history_take: "Take {n}",
+      qr_title: "▦ QR code", qr_hint: "Scan for project, scene, take and timecode",
+      export_title: "⤓ Export metadata",
+      export_desc: "Exports all recorded takes as a file for editing or partial import into DaVinci Resolve. The <strong>File Name</strong> column stays empty — fill it in manually with the file names after ingest, then use <em>Media Pool → Metadata → Import</em> in Resolve.",
+      btn_export_csv: "📄 CSV (Resolve)", btn_export_json: "🧾 JSON",
+      install_text: "📲 Add Clapperboard Digital to your home screen for instant access, no browser bar.",
+      install_yes: "Install",
+      toast_project_needed: "Fill in the project before CLAP (✏️)",
+      toast_take_recorded: "Take {take} recorded — {timecode}",
+      toast_saved: "Saved",
+      confirm_reset_fields: "Reset all fields?",
+      toast_fields_reset: "Fields reset",
+      toast_tc_set: "Timecode set",
+      toast_tc_synced: "Synced to system clock",
+      confirm_clear_history: "Clear the entire take history? This can't be undone.",
+      toast_history_cleared: "History cleared",
+      toast_history_loaded: "Details loaded from history",
+      toast_nothing_to_export: "No takes to export",
+      toast_csv_exported: "CSV exported", toast_json_exported: "JSON exported",
+    },
+    es: {
+      title_qr: "Código QR", title_history: "Historial (h)", title_export: "Exportar metadatos",
+      title_edit: "Editar", title_fullscreen: "Pantalla completa (f)",
+      tc_label: "TIMECODE — toca para ajustar manualmente",
+      label_camera: "Cámara", label_scene: "Escena", label_take: "Toma", label_project: "Proyecto",
+      label_director: "Director", label_notes: "Notas", label_date: "Fecha", label_time: "Hora",
+      project_placeholder_display: "Toca para completar",
+      btn_take_minus: "Toma −", btn_take_plus: "Toma +", btn_clap: "Clap",
+      exit_hint: "Pulsa ESC o toca la pantalla para salir de pantalla completa",
+      edit_title: "✏️ Editar información",
+      edit_label_project: "📁 Proyecto", edit_label_scene: "🎬 Escena", edit_label_director: "🎤 Director",
+      edit_label_camera: "🎥 Cámara", edit_label_notes: "📝 Notas",
+      ph_project: "Boda de Ana y Miguel", ph_director: "Cristi Gordas", ph_notes: "Estabilizador activado",
+      btn_reset: "🔄 Restablecer", btn_save: "Guardar",
+      tc_sheet_title: "⏱ Ajustar timecode", tc_label_fps: "Cuadros por segundo (fps)",
+      btn_tc_sync: "🔄 Sincronizar con la hora del sistema",
+      history_title: "📜 Historial de tomas", btn_clear_history: "🗑 Borrar historial",
+      history_empty: "Aún no hay tomas registradas.<br>Pulsa CLAP para empezar.",
+      history_take: "Toma {n}",
+      qr_title: "▦ Código QR", qr_hint: "Escanea para proyecto, escena, toma y timecode",
+      export_title: "⤓ Exportar metadatos",
+      export_desc: "Exporta todas las tomas registradas como archivo para montaje o importación parcial en DaVinci Resolve. La columna <strong>File Name</strong> queda vacía — complétala manualmente con los nombres de archivo tras el ingest, luego usa <em>Media Pool → Metadata → Import</em> en Resolve.",
+      btn_export_csv: "📄 CSV (Resolve)", btn_export_json: "🧾 JSON",
+      install_text: "📲 Añade Clapperboard Digital a tu pantalla de inicio para acceso instantáneo, sin la barra del navegador.",
+      install_yes: "Instalar",
+      toast_project_needed: "Completa el proyecto antes de CLAP (✏️)",
+      toast_take_recorded: "Toma {take} registrada — {timecode}",
+      toast_saved: "Guardado",
+      confirm_reset_fields: "¿Restablecer todos los campos?",
+      toast_fields_reset: "Campos restablecidos",
+      toast_tc_set: "Timecode ajustado",
+      toast_tc_synced: "Sincronizado con la hora del sistema",
+      confirm_clear_history: "¿Borrar todo el historial de tomas? Esta acción no se puede deshacer.",
+      toast_history_cleared: "Historial borrado",
+      toast_history_loaded: "Detalles cargados del historial",
+      toast_nothing_to_export: "No hay tomas para exportar",
+      toast_csv_exported: "CSV exportado", toast_json_exported: "JSON exportado",
+    },
+  };
+
+  function currentLang() {
+    const saved = localStorage.getItem(LANG_KEY);
+    return TRANSLATIONS[saved] ? saved : "ro";
+  }
+  let lang = currentLang();
+
+  function t(key, params) {
+    const dict = TRANSLATIONS[lang] || TRANSLATIONS.ro;
+    let text = dict[key] != null ? dict[key] : (TRANSLATIONS.ro[key] || key);
+    if (params) {
+      Object.keys(params).forEach((k) => { text = text.replace(`{${k}}`, params[k]); });
+    }
+    return text;
+  }
+
+  function applyLang(newLang) {
+    lang = TRANSLATIONS[newLang] ? newLang : "ro";
+    localStorage.setItem(LANG_KEY, lang);
+    document.documentElement.lang = lang;
+
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      el.innerHTML = t(el.getAttribute("data-i18n"));
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      el.setAttribute("placeholder", t(el.getAttribute("data-i18n-placeholder")));
+    });
+    document.querySelectorAll("[data-i18n-title]").forEach((el) => {
+      el.setAttribute("title", t(el.getAttribute("data-i18n-title")));
+    });
+    document.querySelectorAll(".lang-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.lang === lang);
+    });
+
+    renderFields();
+    if (document.getElementById("history-overlay").classList.contains("open")) renderHistoryList();
+  }
+
+  document.querySelectorAll(".lang-btn").forEach((btn) => {
+    btn.addEventListener("click", () => applyLang(btn.dataset.lang));
+  });
 
   const STATE_KEY = "clapperboard_state_v2";
   const HISTORY_KEY = "clapperboard_history";
@@ -413,14 +585,14 @@
   setInterval(() => { renderClock(); renderQr(); }, 1000);
 
   function renderFields() {
-    document.getElementById("disp-project").textContent = state.project || "Atinge pentru a completa";
+    document.getElementById("disp-project").textContent = state.project || t("project_placeholder_display");
     document.getElementById("disp-scene").textContent = state.scene || "—";
     document.getElementById("disp-take").textContent = state.take;
     document.getElementById("disp-camera").textContent = state.camera || "—";
     document.getElementById("disp-director").textContent = state.director || "—";
     document.getElementById("disp-notes").textContent = state.notes || "—";
   }
-  renderFields();
+  applyLang(lang);
 
   // Banda de chevron-uri (colorate -> grayscale), ca pe clapetele
   // profesionale reale - generata in SVG, nu cu imagini, ca sa ramana
@@ -540,7 +712,7 @@
 
   document.getElementById("clap-btn").addEventListener("click", () => {
     if (!state.project) {
-      showToast("Completează proiectul înainte de CLAP (✏️)");
+      showToast(t("toast_project_needed"));
       openOverlay("edit-overlay");
       populateEditSheet();
       return;
@@ -556,7 +728,7 @@
 
     playClapSound();
     flashScreen();
-    showToast(`Take ${data.take} înregistrat — ${data.timecode}`);
+    showToast(t("toast_take_recorded", { take: data.take, timecode: data.timecode }));
 
     state.take += 1;
     saveState();
@@ -603,17 +775,17 @@
     renderFields();
     renderQr();
     closeOverlay("edit-overlay");
-    showToast("Salvat");
+    showToast(t("toast_saved"));
   });
 
   document.getElementById("reset-fields-btn").addEventListener("click", () => {
-    if (!confirm("Resetezi toate câmpurile?")) return;
+    if (!confirm(t("confirm_reset_fields"))) return;
     state.project = ""; state.scene = ""; state.director = ""; state.camera = ""; state.notes = ""; state.take = 1;
     saveState();
     renderFields();
     renderQr();
     populateEditSheet();
-    showToast("Câmpuri resetate");
+    showToast(t("toast_fields_reset"));
   });
 
   document.getElementById("tc-block").addEventListener("click", () => {
@@ -644,7 +816,7 @@
     saveState();
     renderTimecode();
     closeOverlay("tc-overlay");
-    showToast("Timecode setat");
+    showToast(t("toast_tc_set"));
   });
 
   document.getElementById("tc-sync-now-btn").addEventListener("click", () => {
@@ -652,18 +824,18 @@
     saveState();
     renderTimecode();
     closeOverlay("tc-overlay");
-    showToast("Sincronizat cu ora sistemului");
+    showToast(t("toast_tc_synced"));
   });
 
   document.getElementById("history-btn").addEventListener("click", () => { renderHistoryList(); openOverlay("history-overlay"); });
   document.getElementById("close-history-btn").addEventListener("click", () => closeOverlay("history-overlay"));
 
   document.getElementById("clear-history-btn").addEventListener("click", () => {
-    if (!confirm("Ștergi tot istoricul de take-uri? Acțiunea nu poate fi anulată.")) return;
+    if (!confirm(t("confirm_clear_history"))) return;
     history = [];
     saveHistory();
     renderHistoryList();
-    showToast("Istoric șters");
+    showToast(t("toast_history_cleared"));
   });
 
   function escapeHtml(str) {
@@ -675,7 +847,7 @@
   function renderHistoryList() {
     const list = document.getElementById("history-list");
     if (!history.length) {
-      list.innerHTML = '<div class="history-empty">Niciun take înregistrat încă.<br>Apasă CLAP pentru a începe.</div>';
+      list.innerHTML = `<div class="history-empty">${t("history_empty")}</div>`;
       return;
     }
     list.innerHTML = history.map(h => `
@@ -684,7 +856,7 @@
           <strong>${escapeHtml(h.project)}${h.scene ? " · " + escapeHtml(h.scene) : ""}</strong>
           <span>${escapeHtml(h.timecode || "")} · ${escapeHtml(h.date)} ${escapeHtml(h.time || "")}</span>
         </div>
-        <div class="badge">Take ${h.take}</div>
+        <div class="badge">${t("history_take", { n: h.take })}</div>
       </div>
     `).join("");
 
@@ -699,7 +871,7 @@
         renderFields();
         renderQr();
         closeOverlay("history-overlay");
-        showToast("Detalii încărcate din istoric");
+        showToast(t("toast_history_loaded"));
       });
     });
   }
@@ -726,7 +898,7 @@
   }
 
   document.getElementById("export-csv-btn").addEventListener("click", () => {
-    if (!history.length) { showToast("Niciun take de exportat"); return; }
+    if (!history.length) { showToast(t("toast_nothing_to_export")); return; }
     const headers = ["File Name", "Project", "Scene", "Take", "Timecode", "Date", "Time", "Director", "Camera", "Notes"];
     const rows = history.slice().reverse().map(h => [
       "", h.project, h.scene, h.take, h.timecode || "", h.date, h.time || "", h.director || "", h.camera || "", h.notes || "",
@@ -734,16 +906,16 @@
     const csv = [headers, ...rows].map(row => row.map(csvEscape).join(",")).join("\r\n");
     const stamp = new Date().toISOString().slice(0, 10);
     downloadBlob(csv, `clapperboard-metadata-${stamp}.csv`, "text/csv;charset=utf-8");
-    showToast("CSV exportat");
+    showToast(t("toast_csv_exported"));
     closeOverlay("export-overlay");
   });
 
   document.getElementById("export-json-btn").addEventListener("click", () => {
-    if (!history.length) { showToast("Niciun take de exportat"); return; }
+    if (!history.length) { showToast(t("toast_nothing_to_export")); return; }
     const data = history.slice().reverse();
     const stamp = new Date().toISOString().slice(0, 10);
     downloadBlob(JSON.stringify(data, null, 2), `clapperboard-metadata-${stamp}.json`, "application/json");
-    showToast("JSON exportat");
+    showToast(t("toast_json_exported"));
     closeOverlay("export-overlay");
   });
 
