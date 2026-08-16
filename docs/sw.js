@@ -6,13 +6,14 @@
 // offline. Static assets (manifest, icons) are cache-first, since they
 // rarely change and don't need to be re-fetched every load.
 
-const CACHE_NAME = "clapperboard-pwa-v4";
+const CACHE_NAME = "clapperboard-pwa-v5";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png",
+  "./qrcode.min.js",
 ];
 
 self.addEventListener("install", (event) => {
