@@ -2,7 +2,7 @@
 
 All notable changes to Clapperboard Digital are documented here.
 
-## [1.1.1] — Unreleased
+## [1.2.0] — 2026-09-06
 
 ### Added
 - **PWA language switcher** (RO/EN/ES, small pill buttons top-right, Romanian by default): the desktop app already had full RO/EN/ES translations (`backend/translations.py`) — the PWA was Romanian-only until now. Covers every label, button, dialog, toast and confirm on the slate; choice is remembered per device (localStorage)
