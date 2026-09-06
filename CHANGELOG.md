@@ -2,6 +2,14 @@
 
 All notable changes to Clapperboard Digital are documented here.
 
+## [1.2.1] — 2026-09-07
+
+### Fixed
+- Sincronizat `APP_VERSION` (afișat în About) cu versiunea reală publicată — rămăsese blocat la `1.0.0` din commit-ul inițial, deși tag-urile ajunseseră la `1.2.0`
+
+### Added
+- Semnare Windows (Code Signing) infrastructură internă — Regula 34
+
 ## [1.2.0] — 2026-09-06
 
 ### Added

@@ -12,7 +12,7 @@ import json
 import platform
 
 APP_NAME = "ClapperboardDigital"
-APP_VERSION = "1.0.0"
+APP_VERSION = "1.2.1"  # actualizeaza aici la fiecare "git tag vX.Y.Z" (era desincronizat, blocat la 1.0.0 desi tag-urile ajunsesera la 1.2.0)
 BUNDLE_ID = "com.gordasgdc.clapperboarddigital"
 
 DEFAULT_SETTINGS = {
