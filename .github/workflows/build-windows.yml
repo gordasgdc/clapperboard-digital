@@ -12,6 +12,13 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    # `secrets` NU e un context permis direct intr-un `if:` de pas
+    # (confirmat cu actionlint) - valoarea trece printr-un `env:` la
+    # nivel de JOB (aici `secrets` E permis), iar pasii citesc
+    # `env.HAS_WIN_SELFSIGN` (context permis in `if:`). Vezi CGConvertor,
+    # acelasi tipar, CLAUDE.md Regula 34.
+    env:
+      HAS_WIN_SELFSIGN: ${{ secrets.WIN_SELFSIGN_PFX_BASE64 != '' }}
 
     steps:
       - name: Checkout code
@@ -30,6 +37,22 @@ jobs:
       - name: Build .exe with PyInstaller
         run: |
           pyinstaller build/build-windows.spec --noconfirm
+
+      # [CLAUDE.md Regula 34] Semnare Self-Signed, DOAR pentru testare
+      # interna/cerc restrans (NU elimina SmartScreen pentru publicul larg
+      # - vezi codesigning/README-windows.md). Ruleaza DOAR daca secretele
+      # exista (Cristi le incarca o singura data, direct de pe Windows real
+      # - certificatul nu trece niciodata prin conversatia cu Claude) -
+      # altfel build-ul continua NESEMNAT, exact ca inainte, fara nicio
+      # eroare. Acest repo nu are installer Inno Setup - un singur pas de
+      # semnare, pe executabilul PyInstaller final.
+      - name: Semneaza ClapperboardDigital.exe (Self-Signed, test intern)
+        if: ${{ env.HAS_WIN_SELFSIGN == 'true' }}
+        shell: pwsh
+        env:
+          WIN_SELFSIGN_PFX_BASE64: ${{ secrets.WIN_SELFSIGN_PFX_BASE64 }}
+          WIN_SELFSIGN_PFX_PASSWORD: ${{ secrets.WIN_SELFSIGN_PFX_PASSWORD }}
+        run: .\codesigning\sign-windows.ps1 -TargetPath "dist\ClapperboardDigital.exe"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
