@@ -66,3 +66,20 @@ Regula de mai sus se aplică deci cu UN SINGUR pas de semnare (executabilul
 final), nu doi (executabil + installer) ca la aplicațiile GDC care au un
 installer Inno Setup separat — vezi `codesigning/README-windows.md` din
 acest repo.
+
+## Etapa 2026-09-11 — v1.2.1 publicat cu semnare Windows activa
+
+Secretele CI (`WIN_SELFSIGN_PFX_BASE64`/`WIN_SELFSIGN_PFX_PASSWORD`,
+certificat COMUN ecosistemului) erau deja incarcate de Cristi. Acest release
+e primul in care semnarea Regulii 34 chiar a rulat pe un build real.
+
+Verificat direct, nu presupus: pasul de semnare marcat OK in lista de pasi a
+job-ului, plus directorul de securitate din header-ul PE al installer-ului
+descarcat = 7496 bytes de semnatura Authenticode (acelasi certificat +
+timestamp pe toate aplicatiile). Link stabil `releases/latest/download/...`
+verificat HTTP 200.
+
+**Bug preexistent gasit si reparat pe drum**: `APP_VERSION` din
+`backend/config.py` ramasese blocat la 1.0.0 din commit-ul initial, desi
+tag-urile ajunsesera la 1.2.0 - fereastra About arata o versiune gresita de
+mai multe release-uri. Sincronizat la 1.2.1.
